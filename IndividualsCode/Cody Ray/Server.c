@@ -40,12 +40,15 @@ int main(){
     }
     printf("Server Bound To Port %d\n", port);
 
+    //makes sure there are no current connections to the server and if there are closes the program 
+    //also limits the amount of clients that can be connected 
     if(listen(serverSocket, 3) == 0){
         printf("Waiting For Connections\n");
     }else{
         return 0;
     }
 
+    //new values to store information for each of the child servers that are interacting with each client
     int newSocket;
     struct sockaddr_in newServerAddress;
     socklen_t newServerAddressSize;
