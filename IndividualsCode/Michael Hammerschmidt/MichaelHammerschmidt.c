@@ -160,6 +160,13 @@ int main(int argc, char *argv[])
         else if ((strncmp(userInput, "bookInfo", 8) == 0) || (strncmp(userInput, "BookInfo", 8) == 0) || (strncmp(userInput, "BookInfo.txt", 12) == 0) || (strncmp(userInput, "BookInfo.txt", 12) == 0))
         {
             printf("\nReading bookInfo file\n");
+            readFile("bookInfo.txt", &ptable);
+            end = true;
+        }
+        else if ((strncmp(userInput, "options", 7) == 0))
+        {
+            printf("\nReading bookInfo file\n");
+            readFile("options.txt", &ptable);
             end = true;
         }
         else
