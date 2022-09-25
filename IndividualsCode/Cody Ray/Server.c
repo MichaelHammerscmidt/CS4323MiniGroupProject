@@ -1,3 +1,8 @@
+// Group G
+// Cody Ray
+// 09/25/2022
+// Code to initialize the server and the child servers that it creates to handle each client that connects to the main server
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -21,8 +26,6 @@ int main(){
     }
     printf("Server Socket Created Successfully\n");
 
-    //sets the server address to null values to ensure there are no unexpected values
-    memset(&serverAddress, '\0', sizeof(serverAddress));
     //sets the server to an ipv4 socket
     serverAddress.sin_family = AF_INET;
     //ensures the server port value is stored correctly by using htons
@@ -40,22 +43,20 @@ int main(){
     }
     printf("Server Bound To Port %d\n", port);
 
-    //makes sure there are no current connections to the server and if there are closes the program 
-    //also limits the amount of clients that can be connected 
-    if(listen(serverSocket, 3) == 0){
-        printf("Waiting For Connections\n");
-    }else{
-        return 0;
-    }
+    //Starts listening for connections on the socket we created for the server
+    listen(serverSocket, 3);
+    printf("Waiting For Connections...\n");
 
-    //new values to store information for each of the child servers that are interacting with each client
+    //new values to store information for each of the child servers that are going to handle the
+    //interactions with each new client
     int newSocket;
     struct sockaddr_in newServerAddress;
     socklen_t newServerAddressSize;
     pid_t childProcessID;
 
-    while(1) {
-        //return point to get rid of child processes once their client disconnects
+    //infinite loop to handle the rest of the server client connections and communication
+    while(1){
+        //return point for the child processes once their client disconnects
         ReturnToHere:
         //creates a new server socket for future clients to connect to
         newSocket = accept(serverSocket, (struct sockaddr*)&newServerAddress, &newServerAddressSize);
@@ -66,7 +67,7 @@ int main(){
 
         //creates each of the child processes
         if((childProcessID = fork()) == 0){
-            //closes the main port that clients use to connect on the child processes
+            //closes the main port that clients use to connect in the child processes
             close(serverSocket);
             while(1){
                 //receives messages from the client
@@ -74,7 +75,8 @@ int main(){
                 //checks to make sure the client has not exited and if it has breaks out of the loop that controls child processes
                 if(strcmp(buffer, "exit") == 0){
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-                    //
+                    //temporary return point for the child process to break the loop with the current connected client
+                    //dont think this is the correct way to kill the child process
                     goto ReturnToHere;
                 }else{
                     //displays what the client has sent to the server
