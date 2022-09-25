@@ -1,0 +1,105 @@
+﻿Title,Book category,Star rating,Price,Stock,Quantity
+A Light in the Attic,Poetry,Three,51.77,Out of stock,0
+Tipping the Velvet,Historical Fiction,One,53.74,In stock,20
+Soumission,Fiction,One,50.1,In stock,20
+Sharp Objects,Mystery,Four,47.82,Out of stock,0
+Sapiens A Brief History of Humankind,History,Five,54.23,Out of stock,0
+The Dirty Little Secrets of Getting Your Dream Job,Business,Four,33.34,Out of stock,0
+The Black Maria,Poetry,One,52.15,In stock,19
+Shakespeare's Sonnets,Poetry,Four,20.66,Out of stock,0
+Scott Pilgrim's Precious Little Life (Scott Pilgrim #1),Sequential Art,Five,52.29,In stock,19
+Rip it Up and Start Again,Music,Five,35.02,In stock,19
+"Our Band Could Be Your Life Scenes from the American Indie Underground; 1981-1991",Music,Three,57.25,In stock,19
+Olio,Poetry,One,23.88,In stock,19
+Mesaerion The Best Science Fiction Stories 1800-1849,Science Fiction,One,37.59,Out of stock,0
+Libertarianism for Beginners,Politics,Two,51.33,In stock,19
+It's Only the Himalayas,Travel,Two,45.17,Out of stock,0
+In Her Wake,Thriller,One,12.84,In stock,19
+How Music Works,Music,Two,37.32,In stock,19
+"Foolproof Preserving A Guide to Small Batch Jams; Jellies; Pickles; Condiments; and More A Foolproof Guide to Making Small Batch Jams; Jellies; Pickles; Condiments; and More",Food and Drink,Three,30.52,Out of stock,0
+Chase Me (Paris Nights #2),Romance,Five,25.27,In stock,19
+Black Dust,Romance,Five,34.53,In stock,19
+Birdsong A Story in Pictures,Childrens,Three,54.64,Out of stock,0
+Worlds Elsewhere Journeys Around Shakespeares Globe,Nonfiction,Five,40.3,Out of stock,0
+Wall and Piece,Art,Four,44.18,Out of stock,0
+The Four Agreements A Practical Guide to Personal Freedom,Spirituality,Five,17.66,Out of stock,0
+The Five Love Languages How to Express Heartfelt Commitment to Your Mate,Nonfiction,Three,31.05,Out of stock,0
+The Elephant Tree,Thriller,Five,23.82,In stock,18
+The Bear and the Piano,Childrens,One,36.89,Out of stock,0
+Sophie's World,Philosophy,Five,15.94,Out of stock,0
+"In a Dark; Dark Wood",Mystery,One,19.63,In stock,18
+Behind Closed Doors,Thriller,Four,52.22,In stock,18
+You can't bury them all Poems,Poetry,Two,33.63,Out of stock,0
+Slow States of Collapse Poems,Poetry,Three,57.31,In stock,17
+Reasons to Stay Alive,Nonfiction,Two,26.41,In stock,17
+Private Paris (Private #10),Fiction,Five,47.61,Out of stock,0
+#HigherSelfie Wake Up Your Life. Free Your Soul. Find Your Tribe.,Nonfiction,Five,23.11,Out of stock,0
+When We Collided,Contemporary,One,31.77,Out of stock,0
+"We Love You; Charlie Freeman",Fiction,Five,50.27,In stock,16
+Untitled Collection Sabbath Poems 2014,Poetry,Four,14.27,In stock,16
+"Unseen City The Majesty of Pigeons; the Discreet Charm of Snails  Other Wonders of the Urban Wilderness",Nonfiction,Four,44.18,Out of stock,0
+Unicorn Tracks,Fantasy,Three,18.78,In stock,16
+"Unbound How Eight Technologies Made Us Human; Transformed Society; and Brought Our World to the Brink",History,One,25.52,In stock,16
+Tsubasa WoRLD CHRoNiCLE 2 (Tsubasa WoRLD CHRoNiCLE #2),Sequential Art,One,16.28,Out of stock,0
+Throwing Rocks at the Google Bus How Growth Became the Enemy of Prosperity,Nonfiction,Three,31.12,In stock,16
+This One Summer,Sequential Art,Four,19.49,In stock,16
+Thirst,Fiction,Five,17.27,In stock,16
+The Secret of Dreadwillow Carse,Childrens,One,56.13,Out of stock,0
+"The Pioneer Woman Cooks Dinnertime Comfort Classics; Freezer Food; 16-Minute Meals; and Other Delicious Ways to Solve Supper!",Food and Drink,One,56.41,In stock,16
+The Past Never Ends,Mystery,Four,56.5,In stock,16
+The Nameless City (The Nameless City #1),Sequential Art,Four,38.16,In stock,16
+The Murder That Never Was (Forensic Instincts #5),Fiction,Three,54.11,Out of stock,0
+The Most Perfect Thing Inside (and Outside) a Bird's Egg,Science,Four,42.96,Out of stock,0
+The Life-Changing Magic of Tidying Up The Japanese Art of Decluttering and Organizing,Nonfiction,Three,16.77,In stock,16
+The Gutsy Girl Escapades for Your Life of Epic Adventure,Nonfiction,One,37.13,In stock,16
+The Electric Pencil Drawings from Inside State Hospital No. 3,Nonfiction,One,56.06,Out of stock,0
+The Death of Humanity and the Case for Life,Philosophy,Four,58.11,In stock,16
+"The Bulletproof Diet Lose up to a Pound a Day; Reclaim Energy and Focus; Upgrade Your Life",Health,Three,49.05,Out of stock,0
+The Age of Genius The Seventeenth Century and the Birth of the Modern Mind,History,One,19.73,In stock,16
+The Activist's Tao Te Ching Ancient Advice for a Modern Revolution,Spirituality,Five,32.24,Out of stock,0
+Spark Joy An Illustrated Master Class on the Art of Organizing and Tidying Up,Nonfiction,Four,41.83,Out of stock,0
+Security,Horror,Two,39.25,In stock,16
+"Saga; Volume 6 (Saga (Collected Editions) #6)",Fantasy,Three,25.02,In stock,16
+"Saga; Volume 5 (Saga (Collected Editions) #5)",Sequential Art,Two,51.04,Out of stock,0
+Reskilling America Learning to Labor in the Twenty-First Century,Nonfiction,Two,19.83,In stock,16
+"Rat Queens; Vol. 3 Demons (Rat Queens (Collected Editions) #11-15)",Sequential Art,Three,50.4,Out of stock,0
+"Princess Jellyfish 2-in-1 Omnibus; Vol. 01 (Princess Jellyfish 2-in-1 Omnibus #1)",Sequential Art,Five,13.61,In stock,16
+Princess Between Worlds (Wide-Awake Princess #5),Fantasy,Five,13.34,Out of stock,0
+"Pop Gun War; Volume 1 Gift",Sequential Art,One,18.97,In stock,16
+"Political Suicide Missteps; Peccadilloes; Bad Calls; Backroom Hijinx; Sordid Pasts; Rotten Breaks; and Just Plain Dumb Mistakes in the Annals of American Politics",History,Two,36.28,In stock,16
+Patience,Sequential Art,Three,10.16,In stock,16
+"Outcast; Vol. 1 A Darkness Surrounds Him (Outcast #1)",Sequential Art,Four,15.44,Out of stock,0
+orange The Complete Collection 1 (orange The Complete Collection #1),Sequential Art,One,48.41,Out of stock,0
+Online Marketing for Busy Authors A Step-By-Step Guide,Self Help,One,46.35,Out of stock,0
+My Paris Kitchen Recipes and Stories,Food and Drink,Two,33.37,Out of stock,0
+Masks and Shadows,Fantasy,Two,56.4,In stock,16
+"Mama Tried Traditional Italian Cooking for the Screwed; Crude; Vegan; and Tattooed",Food and Drink,Four,14.02,In stock,16
+"Lumberjanes; Vol. 2 Friendship to the Max (Lumberjanes #5-8)",Sequential Art,Two,46.91,Out of stock,0
+"Lumberjanes; Vol. 1 Beware the Kitten Holy (Lumberjanes #1-4)",Sequential Art,Three,45.61,In stock,16
+Lumberjanes Vol. 3 A Terrible Plan (Lumberjanes #9-12),Sequential Art,Two,19.92,In stock,16
+"Layered Baking; Building; and Styling Spectacular Cakes",Food and Drink,One,40.11,In stock,16
+Join,Science Fiction,Five,35.67,Out of stock,0
+In the Country We Love My Family Divided,Nonfiction,Four,22,In stock,16
+Immunity How Elie Metchnikoff Changed the Course of Modern Medicine,Science,Five,57.36,Out of stock,0
+"I Hate Fairyland; Vol. 1 Madly Ever After (I Hate Fairyland (Compilations) #1-5)",Sequential Art,Two,29.17,In stock,16
+I am a Hero Omnibus Volume 1,Sequential Art,Three,54.63,In stock,16
+How to Be Miserable 40 Strategies You Already Use,Self Help,One,46.03,Out of stock,0
+Her Backup Boyfriend (The Sorensen Family #1),Romance,One,33.97,In stock,16
+"Giant Days; Vol. 2 (Giant Days #5-8)",Sequential Art,Two,22.11,In stock,16
+Forever and Forever The Courtship of Henry Longfellow and Fanny Appleton,Historical Fiction,Three,29.69,Out of stock,0
+First and First (Five Boroughs #3),Romance,Four,15.97,Out of stock,0
+Fifty Shades Darker (Fifty Shades #2),Romance,One,21.96,Out of stock,0
+Everydata The Misinformation Hidden in the Little Data You Consume Every Day,Nonfiction,Two,54.35,In stock,16
+"Don't Be a Jerk And Other Practical Advice from Dogen; Japan's Greatest Zen Master",Religion,Two,37.97,In stock,16
+Danganronpa Volume 1,Sequential Art,Four,51.99,In stock,16
+Crown of Midnight (Throne of Glass #2),Fantasy,Three,43.29,In stock,16
+"Codename Baboushka; Volume 1 The Conclave of Death",Sequential Art,Four,36.72,In stock,16
+Camp Midnight,Sequential Art,Four,17.08,Out of stock,0
+Call the Nurse True Stories of a Country Nurse on a Scottish Isle,Nonfiction,Five,29.14,Out of stock,0
+"Bitch Planet; Vol. 1 Extraordinary Machine (Bitch Planet (Collected Editions))",Sequential Art,Two,37.92,Out of stock,0
+"Avatar The Last Airbender Smoke and Shadow; Part 3 (Smoke and Shadow #3)",Fantasy,Two,28.09,In stock,16
+Algorithms to Live By The Computer Science of Human Decisions,Nonfiction,One,30.81,Out of stock,0
+A Murder in Time,Mystery,One,16.64,In stock,16
+A Flight of Arrows (The Pathfinders #2),Historical Fiction,Five,55.53,In stock,16
+A Court of Thorns and Roses (A Court of Thorns and Roses #1),Fantasy,One,52.37,Out of stock,0
+(Un)Qualified How God Uses Broken People to Do Big Things,Christian,Five,54,In stock,16
