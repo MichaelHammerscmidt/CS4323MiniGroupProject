@@ -1,8 +1,3 @@
-// Group G
-// Cody Ray
-// 09/25/2022
-// Code to initialize the server and the child servers that it creates to handle each client that connects to the main server
-
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -478,6 +473,8 @@ extern struct uniqueRecordStruct *uniqueRecordArray;
 int row = 0;
 int col = 0;
 
+// This code is commented out because it is defined within a seperate main function
+
 // int main() {
 
 //     char *filename = "bookInfo1.txt";
@@ -494,6 +491,11 @@ int col = 0;
 // }
 
 // Cody's server ---------------------------------------------------------------
+
+// Group G
+// Cody Ray
+// 09/25/2022
+// Code to initialize the server and the child servers that it creates to handle each client that connects to the main server
 
 int main(){
     //port used for connection between client and server
