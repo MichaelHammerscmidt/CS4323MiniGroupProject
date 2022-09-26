@@ -1,3 +1,8 @@
+// Group G
+// Cody Ray
+// 09/25/2022
+// Code to initialize the client and attempt to connect to the server
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -49,7 +54,7 @@ int main(){
 
         //checks if there are errors in input sent by server and displays input if there are no issues
         if(recv(clientSocket, buffer, 512, 0) < 0){
-            printf("Error In Message From Server");
+            printf("Error In Message Sent to Server");
         }else{
             printf("Message Received By Server: %s\n", buffer);
         }
