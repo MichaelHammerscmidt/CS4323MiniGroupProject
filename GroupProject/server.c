@@ -166,6 +166,8 @@ bool readFile(char fileName[], DataTable *ptable)
 //#include "process.c"
 
 
+// This code is commented out because it is defined within a seperate main function
+
 // int main() {
 
 //    //struct definition
