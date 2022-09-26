@@ -21,109 +21,6 @@
 #include <sys/msg.h>
 #include <sys/wait.h>
 
-// Jacob's Code   ----------------------------------------------------------------
-
-
-int saveFile(DataTable *ptable, DataColumn *pcolumn)
-{
-
-
-int i, j, k; //initializing variables for later for loops
-
-int n = gets(DataTable.numCols); //initialize n for the number of columns in the table
-int z = gets(DataTable.numRows); //initialize z for the number of rows in the table
-
-FILE *output; //creating file
-
-output = fopen ("output.txt", "w"); //open the file for writing
-
-
-
-for(k = 0; k < n, k++) //loop for adding the data headers to the file
-{
-	gets((ptable.colHeaders);
-	printf("\t\t");
-
-
-
-}
-
-for(j = 0; j < z; j++) //loop for adding the rest of the data to the file. This loop is for the rows
-{
-	for(i = 0; i < n; i++) //this loop is for the columns
-	{
-		gets(*pcolumn.columns);
-		printf("\t\t"); //formatting
-
-	
-	}
-
-	printf("\n"); //formatting
-
-}
-
-
-/*
-fwrite (&input, sizeof(struct DataTable), 1, outfile);
-this is commented out because I think im gonna stop trying to use gets and change to fwrite to get things to work better.
-}
-*/
-
-
-// Rebecca's Code ----------------------------------------------------------------
-
-// Group G
-// Rebecca Wasserott
-// rebecca.wasserott@okstate.edu
-// 09/25
-// The logic to enable the server to display the contents of the struct array on the client
-// Not finished. This is for the progress report.
-
-//#include "process.c"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// int main() {
-
-//    //struct definition
-//    typedef struct{
-//        //dynamic array of strings
-//        char **data;
-//    }
-//    DataColumn;
-
-//    typedef struct{
-//        //dynamic array of strings for the column headers
-//        char** colHeaders;
-//        //dynamic array of datacolumns
-//        DataColumn *cloumns;
-
-//        int numRows;
-//        int numCols;
-//    }
-//    DataTable;
-
-//    char *filename = "bookInfo1.txt";
-//    char *column = "Stock";
-//    char *uniqueValue = "Out of stock";
-
-//    int row = 0;
-//    int col = 0;
-
-//    char*** recordsArray = getRecordsByUniqueValue(filename, column, uniqueValue, &row, &col);
-
-//    for (int i = 1; i < row; i++) {
-//        for (int j = 0; j < col; j++) {
-//            printf("%d. %s\n", (j + 1), recordsArray[0][j]);
-
-//            printf("%s\n\n", recordsArray[i][j]);
-//        }
-//        printf("---------------------------------\n");
-//    }
-
-// }
 
 // Michael's Code ---------------------------------------------------------------
 #define LINE_LENGTH 256
@@ -254,6 +151,111 @@ bool readFile(char fileName[], DataTable *ptable)
 
     return true;
 }
+
+
+
+// Rebecca's Code ----------------------------------------------------------------
+
+// Group G
+// Rebecca Wasserott
+// rebecca.wasserott@okstate.edu
+// 09/25
+// The logic to enable the server to display the contents of the struct array on the client
+// Not finished. This is for the progress report.
+
+//#include "process.c"
+
+
+// int main() {
+
+//    //struct definition
+//    typedef struct{
+//        //dynamic array of strings
+//        char **data;
+//    }
+//    DataColumn;
+
+//    typedef struct{
+//        //dynamic array of strings for the column headers
+//        char** colHeaders;
+//        //dynamic array of datacolumns
+//        DataColumn *cloumns;
+
+//        int numRows;
+//        int numCols;
+//    }
+//    DataTable;
+
+//    char *filename = "bookInfo1.txt";
+//    char *column = "Stock";
+//    char *uniqueValue = "Out of stock";
+
+//    int row = 0;
+//    int col = 0;
+
+//    char*** recordsArray = getRecordsByUniqueValue(filename, column, uniqueValue, &row, &col);
+
+//    for (int i = 1; i < row; i++) {
+//        for (int j = 0; j < col; j++) {
+//            printf("%d. %s\n", (j + 1), recordsArray[0][j]);
+
+//            printf("%s\n\n", recordsArray[i][j]);
+//        }
+//        printf("---------------------------------\n");
+//    }
+
+// }
+
+
+// Jacob's Code   ----------------------------------------------------------------
+
+
+int saveFile(DataTable *ptable, DataColumn *pcolumn)
+{
+
+
+int i, j, k; //initializing variables for later for loops
+
+int n = gets(DataTable.numCols); //initialize n for the number of columns in the table
+int z = gets(DataTable.numRows); //initialize z for the number of rows in the table
+
+FILE *output; //creating file
+
+output = fopen ("output.txt", "w"); //open the file for writing
+
+
+
+for(k = 0; k < n, k++) //loop for adding the data headers to the file
+{
+	gets((ptable.colHeaders);
+	printf("\t\t");
+
+
+
+}
+
+for(j = 0; j < z; j++) //loop for adding the rest of the data to the file. This loop is for the rows
+{
+	for(i = 0; i < n; i++) //this loop is for the columns
+	{
+		gets(*pcolumn.columns);
+		printf("\t\t"); //formatting
+
+	
+	}
+
+	printf("\n"); //formatting
+
+}
+
+
+/*
+fwrite (&input, sizeof(struct DataTable), 1, outfile);
+this is commented out because I think im gonna stop trying to use gets and change to fwrite to get things to work better.
+}
+*/
+
+
 
 // Christian's code ---------------------------------------------------------------
 
