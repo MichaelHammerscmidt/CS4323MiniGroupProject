@@ -23,6 +23,13 @@
 
 
 // Michael's Code ---------------------------------------------------------------
+// Group G
+// Michael Hammerschmidt
+// mihamme@okstate.edu
+// 09/25
+// The function to read in all the contents from the filename passed in as the first argument and 
+// save them to the struct passed in as the second argument
+// Finished.
 #define LINE_LENGTH 256
 #define INITIAL_NUM_ROWS 200
 #define ROW_INCRIMENT 50
