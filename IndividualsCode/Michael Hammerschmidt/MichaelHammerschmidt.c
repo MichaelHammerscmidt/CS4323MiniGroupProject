@@ -20,35 +20,36 @@ typedef struct
     int numCols;
 } DataTable;
 
-bool readFile(char fileName[], DataTable *ptable)
+bool readFile(char filesName[], DataTable *saveTable)
 {
-    FILE *file;
+    FILE *fp;
 
-    char errorMsg[] = "Error. File Null";
+    printf("Read file: %s", &filesName[0]);
+    // fopen_s(&fp, filesName, "r");
+    // if (fp == NULL)
+    fopen(filesName, "r");
 
-    printf("Read file: %s", &fileName[0]);
-    fopen_s(&file, fileName, "r");
-    if (file == NULL)
+    if (&filesName == NULL)
     {
-        printf("%s", errorMsg);
+        printf("%s", "Error: The file is Null");
         return false;
     }
 
-    char line[LINE_LENGTH];
-    char *temp;
-    int currentLine = 0, j = 0;
-    const char comma[] = ",";
+    char bufferIn[LINE_LENGTH];
+    char *tokenizedBuffer;
+    int rowsSoFar = 0;
+    const char delim[] = ",";
 
-    fgets(line, LINE_LENGTH, file);
-    char *bufferPt = line;
-    ptable->numCols = 0;
+    fgets(bufferIn, LINE_LENGTH, fp);
+    char *bufferPt = bufferIn;
+    saveTable->numCols = 0;
     printf("\nBuffer pointer: %s", bufferPt);
     while (*bufferPt)
     {
         if (*bufferPt != ',' && *bufferPt != '\t')
         {
-            ptable->numCols++, bufferPt++;
-            // printf("\nnumCol: %d", ptable->numCols);
+            saveTable->numCols++, bufferPt++;
+            // printf("\nnumCol: %d", saveTable->numCols);
         }
         while (*bufferPt && *bufferPt != ',' && *bufferPt != '\t')
         {
@@ -60,72 +61,72 @@ bool readFile(char fileName[], DataTable *ptable)
         }
     }
 
-    printf("\nInt col = %d\n\n", ptable->numCols);
+    printf("\nNumber of col in file = %d\n\n", saveTable->numCols);
 
-    ptable->numRows = INITIAL_NUM_ROWS;
-    ptable->columns = calloc(ptable->numCols, sizeof(DataColumn));
-    for (int i = 0; i < ptable->numCols; i++)
+    saveTable->numRows = INITIAL_NUM_ROWS;
+    saveTable->columns = calloc(saveTable->numCols, sizeof(DataColumn));
+    for (int i = 0; i < saveTable->numCols; i++)
     {
-        ptable->columns[i].data = calloc(INITIAL_NUM_ROWS, sizeof(char *));
+        saveTable->columns[i].data = calloc(INITIAL_NUM_ROWS, sizeof(char *));
     }
 
-    while (fgets(line, LINE_LENGTH, file))
+    while (fgets(bufferIn, LINE_LENGTH, fp))
     {
-        if (line[0] == '\0')
+        if (bufferIn[0] == '\0')
         {
             continue;
         }
 
-        if (line[strlen(line) - 1] == '\n')
-        { // Discard the newline character
-            line[strlen(line) - 1] = '\0';
+        if (bufferIn[strlen(bufferIn) - 1] == '\n')
+        { // Get rid of the newline character in the buffer
+            bufferIn[strlen(bufferIn) - 1] = '\0';
         }
 
-        if (j == ptable->numRows)
+        if (rowsSoFar == saveTable->numRows)
         {
-            ptable->numRows += ROW_INCRIMENT;
-            for (int i = 0; i < ptable->numCols; i++)
+            saveTable->numRows = saveTable->numRows + ROW_INCRIMENT;
+            for (int i = 0; i < saveTable->numCols; i++)
             {
-                ptable->columns[i].data =
-                    realloc(ptable->columns[i].data, ptable->numRows * sizeof(char *));
-                for (int r = j; r < ptable->numRows; r++)
+                saveTable->columns[i].data = realloc(saveTable->columns[i].data, saveTable->numRows * sizeof(char *));
+                for (int r = rowsSoFar; r < saveTable->numRows; r++)
                 {
-                    ptable->columns[i].data[r] = NULL;
+                    saveTable->columns[i].data[r] = NULL;
                 }
             }
         }
 
-        temp = strtok(line, comma);
-        for (int i = 0; i < ptable->numCols; i++)
+        tokenizedBuffer = strtok(bufferIn, delim);
+        for (int i = 0; i < saveTable->numCols; i++)
         {
-            ptable->columns[i].data[j] = malloc(strlen(temp) + 1);
-            strcpy(ptable->columns[i].data[j], temp);
+            saveTable->columns[i].data[rowsSoFar] = malloc(strlen(tokenizedBuffer) + 1);
+            strcpy(saveTable->columns[i].data[rowsSoFar], tokenizedBuffer);
 
-            // printf("%s\n", temp);
-            printf("%s  ", ptable->columns[i].data[j]);
+            // For testing:
+            // printf("%s\n", tokenizedBuffer);
+            printf("%s  ", saveTable->columns[i].data[rowsSoFar]);
 
-            temp = strtok(NULL, comma);
+            tokenizedBuffer = strtok(NULL, delim);
 
-            if (i % ptable->numCols == 0)
+            if (i % saveTable->numCols == 0)
             {
                 printf("\n");
             }
         }
 
-        j++;
+        rowsSoFar++;
     }
 
-    printf("\nClosing\n");
-    fclose(file);
+    printf("\nClosed file\n");
+    fclose(fp);
 
-    ptable->numRows = j;
-    for (int i = 0; i < ptable->numCols; i++)
+    saveTable->numRows = rowsSoFar;
+    for (int i = 0; i < saveTable->numCols; i++)
     {
-        ptable->columns[i].data =
-            realloc(ptable->columns[i].data, ptable->numRows * sizeof(char *));
-        for (int r = j; r < ptable->numRows; r++)
+        saveTable->columns[i].data =
+            realloc(saveTable->columns[i].data, saveTable->numRows * sizeof(char *));
+        for (int r = rowsSoFar; r < saveTable->numRows; r++)
         {
-            ptable->columns[i].data[r] = NULL;
+            saveTable->columns[i].data[r] = NULL;
         }
     }
 
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
 
     bool end = false;
     char userInput[256];
-    DataTable ptable;
+    DataTable saveTable;
 
     while (end == false)
     {
@@ -154,19 +155,19 @@ int main(int argc, char *argv[])
         else if ((strncmp(userInput, "amazonBestsellers", 17) == 0) || (strncmp(userInput, "AmazonBestsellers", 17) == 0) || (strncmp(userInput, "amazonBestsellers.txt", 21) == 0) || (strncmp(userInput, "AmazonBestsellers.txt", 21) == 0))
         {
             printf("\nReading amazonBestsellers file\n");
-            readFile("amazonBestsellers.txt", &ptable);
+            readFile("amazonBestsellers.txt", &saveTable);
             end = true;
         }
         else if ((strncmp(userInput, "bookInfo", 8) == 0) || (strncmp(userInput, "BookInfo", 8) == 0) || (strncmp(userInput, "BookInfo.txt", 12) == 0) || (strncmp(userInput, "BookInfo.txt", 12) == 0))
         {
             printf("\nReading bookInfo file\n");
-            readFile("bookInfo.txt", &ptable);
+            readFile("bookInfo.txt", &saveTable);
             end = true;
         }
         else if ((strncmp(userInput, "options", 7) == 0))
         {
             printf("\nReading bookInfo file\n");
-            readFile("options.txt", &ptable);
+            readFile("options.txt", &saveTable);
             end = true;
         }
         else
