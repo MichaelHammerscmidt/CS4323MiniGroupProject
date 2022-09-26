@@ -5,7 +5,7 @@ Read text files and process them in parallel for multiple clients connected to t
 gcc -o Server Server.c
 
 ## How to compile client
-gcc -0 Client Client.c
+gcc -o Client Client.c
 
 ## How to run server
 ./Server
