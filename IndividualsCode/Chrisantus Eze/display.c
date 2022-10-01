@@ -1,25 +1,25 @@
-#include "process.c"
+#include "process_comm.c"
+#include "unique_record_struct.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// extern struct uniqueRecordStruct uniqueRecord;
+
 int main() {
     char *filename = "bookInfo1.txt";
     char *column = "Stock";
-    char *uniqueValue = "In stock";
+    char *uniqueValue = "Out of stock";
 
-    int row = 0;
-    int col = 0;
-
-    char ***recordArray = readFileByUniqueValue(filename, column, uniqueValue, &row, &col);
+    struct uniqueRecordStruct uniqueRecord = fetchRecords(column, uniqueValue);
 
 
-    for (int i = 1; i < row; i++) {
-        for (int j = 0; j < col; j++) { 
-            printf("%d. %s\n", (j + 1), recordArray[0][j]);
+    for (int i = 1; i < uniqueRecord.rowSize; i++) {
+        for (int j = 0; j < uniqueRecord.colSize; j++) { 
+            printf("%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
             
-            printf("%s\n\n", recordArray[i][j]);
+            printf("%s\n\n", uniqueRecord.recordArray[i][j]);
         }
         printf("---------------------------------\n");
     }
