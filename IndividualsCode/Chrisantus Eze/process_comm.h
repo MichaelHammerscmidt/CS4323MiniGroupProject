@@ -5,7 +5,7 @@
 
 void createProcesses(int nProcess, char *filename, char *column, char uniques[][15]);
 void sendViaQueue(int msgid, struct processDataStruct processData);
-struct processDataStruct receiveViaQueue(int msgid);
+struct processDataStruct receiveViaQueue(int msgid, char unique[20]);
 
 void sendDatToParent(struct processDataStruct data);
 void receiveDatFromProcess(char uniqueValue[20]);
