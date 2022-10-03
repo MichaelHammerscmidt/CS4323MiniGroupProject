@@ -573,3 +573,44 @@ int main()
     }
     return 0;
 }
+
+void display(char column[20], char uniqueValue[20], int socket) {
+    struct uniqueRecordStruct uniqueRecord = fetchRecords(column, uniqueValue);
+
+    for (int i = 1; i < uniqueRecord.rowSize; i++) {
+        for (int j = 0; j < uniqueRecord.colSize; j++) { 
+            // printf("%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
+            send(socket, uniqueRecord.recordArray[0][j], strlen(uniqueRecord.recordArray[0][j]), 0);
+
+            
+            // printf("%s\n\n", uniqueRecord.recordArray[i][j]);
+
+            send(socket, uniqueRecord.recordArray[i][j], strlen(uniqueRecord.recordArray[i][j]), 0);
+
+        }
+        // printf("---------------------------------\n");
+    }
+}
+
+void save(char column[20], char uniqueValue[20], int socket) {
+    struct uniqueRecordStruct uniqueRecord = fetchRecords(column, uniqueValue);
+
+    FILE *outFile = fopen(filename, "w");
+    printf("snd: filename -> %s\n", filename);
+
+    if (outFile == NULL || !outFile) {
+      printf("There was an error opening the file for writing\n");
+      perror("fopen for writing");
+      exit(EXIT_FAILURE);
+    }
+
+    for (int i = 1; i < uniqueRecord.rowSize; i++) {
+        for (int j = 0; j < uniqueRecord.colSize; j++) { 
+            fprintf(outFile, "%s\n", uniqueRecord.recordArray[0][j]);
+
+            fprintf(outFile, "%s\n", uniqueRecord.recordArray[i][j]);
+        }
+        printf("---------------------------------\n");
+    }
+    fclose(outFile);
+}
