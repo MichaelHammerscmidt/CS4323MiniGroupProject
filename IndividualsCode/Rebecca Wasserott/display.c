@@ -3,7 +3,7 @@
 //rebecca.wasserott@okstate.edu
 //09/25
 //The logic to enable the server to display the contents of the struct array on the client
-//Not finished. This is for the progress report.
+//The display file is included in the server.c file submitted
  
 #include "process.c"
  
