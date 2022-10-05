@@ -594,7 +594,8 @@ int main()
                             send(newSocket, "3.Display Summary \n", strlen("3.Display Summary \n"), 0);
                             send(newSocket, "4. Exit \n", strlen("4. Exit \n"), 0);
 
-                            // scanf("%i", &choice);
+                            // resets the buffer to all null values
+                            bzero(buffer, sizeof(buffer));
                             recv(newSocket, buffer, 512, 0); // saves choice made from user
 
                             if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses to display records
@@ -609,7 +610,8 @@ int main()
                                     send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
                                     send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
 
-                                    // scanf("%i", &midChoice); // saves choice made from user
+                                    // resets the buffer to all null values
+                                    bzero(buffer, sizeof(buffer));
                                     //  receives messages from the client
                                     recv(newSocket, buffer, 512, 0);
 
@@ -671,6 +673,8 @@ int main()
                                     send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
                                     send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
 
+                                    // resets the buffer to all null values
+                                    bzero(buffer, sizeof(buffer));
                                     // saves choice made from user
                                     recv(newSocket, buffer, 512, 0);
 
@@ -756,6 +760,8 @@ int main()
                                     send(newSocket, "6. Year \n", strlen("6. Year \n"), 0);
                                     send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
 
+                                    // resets the buffer to all null values
+                                    bzero(buffer, sizeof(buffer));
                                     // scanf("%i", &midChoice);
                                     recv(newSocket, buffer, 512, 0); // saves choice made from user
 
@@ -820,6 +826,8 @@ int main()
                                     send(newSocket, "6. Year\n", strlen("6. Year \n"), 0);
                                     send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
 
+                                    // resets the buffer to all null values
+                                    bzero(buffer, sizeof(buffer));
                                     // scanf("%i", &midChoice);
                                     recv(newSocket, buffer, 512, 0); // saves choice made from user
 
