@@ -26,8 +26,6 @@ int main(){
     }
     printf("Client Socket Created Successfully\n");
 
-    //sets the server address to null values to ensure there are no unexpected values
-    memset(&serverAddress, '\0', sizeof(serverAddress));
     //sets the server to an ipv4 socket
     serverAddress.sin_family = AF_INET;
     //ensures the server port value is stored correctly by using htons
@@ -56,7 +54,7 @@ int main(){
         if(recv(clientSocket, buffer, 512, 0) < 0){
             printf("Error In Message Sent to Server");
         }else{
-            printf("Message Received By Server: %s\n", buffer);
+            printf("%s\n", buffer);
         }
 
         //ends the connection with the server if exit is inputted

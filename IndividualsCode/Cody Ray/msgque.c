@@ -2,6 +2,8 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
 
 struct msgQue{
     long msgType;
@@ -9,44 +11,33 @@ struct msgQue{
 }message;
 
 int main(){
-    int numOfProcesses;
-    int mqIDs[numOfProcesses];
+    int numOfProcesses = 3;
     int currentProcess = 0;
     key_t processKey;
+    pid_t parentID;
+    pid_t childID;
     int msgID;
 
-    processKey = fork();
+    strcpy(message.msgText,"hello");
+
+    parentID = getpid();
 
     while(currentProcess < numOfProcesses){
-        if (getpid() == 0) {
-            msgID = msgget(processKey, 0666 | IPC_CREAT);
-            break;
-        } else {
-            msgID = msgget(processKey, 0666 | IPC_CREAT);
-            mqIDs[currentProcess] = processKey;
-            currentProcess++;
-            processKey = fork();
+        childID = fork();
+        processKey = childID;
+        msgID = msgget(processKey, 0666 | IPC_CREAT);
+
+        if(parentID == getpid()){
+            printf("current PID = %d\n", getpid());
+            msgsnd(msgID, &message, sizeof(message), 0);
+            wait(NULL);
         }
-    }
-
-    // child process waiting for messages and storing them
-    if(getpid() == 0){
-        msgrcv(msgID, &message, sizeof(message),1,0);
-
-        //call read file by unique value
-
-    }
-
-    //parent process sending messages
-    if(getpid() > 0){
-        //maybe need message.msgType = 1;
-
-        //get data from structure stored from main menu
-        // message = data from main menu
-
-        for(int i = 0; i < sizeof(mqIDs); i++){
-            msgsnd(mqIDs[i], &message, sizeof(message), 0);
+        if (childID != parentID) {
+            printf("%d received\n", currentProcess);
+            msgrcv(msgID, &message, sizeof(message),1,0);
+            printf("%s",message);
         }
+        currentProcess++;
     }
 
     msgctl(msgID, IPC_RMID, NULL);
