@@ -1,8 +1,0 @@
-﻿Title,Book category,Star rating,Price,Stock,Quantity
-A Light in the Attic,Poetry,Three,51.77,Out of stock,0
-Tipping the Velvet,Historical Fiction,One,53.74,In stock,20
-Soumission,Fiction,One,50.1,In stock,20
-Sharp Objects,Mystery,Four,47.82,Out of stock,0
-Sapiens A Brief History of Humankind,History,Five,54.23,Out of stock,0
-The Dirty Little Secrets of Getting Your Dream Job,Business,Four,33.34,Out of stock,0
-The Black Maria,Poetry,One,52.15,In stock,19
