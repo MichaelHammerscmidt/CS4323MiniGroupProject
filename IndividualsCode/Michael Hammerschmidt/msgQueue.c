@@ -1,4 +1,19 @@
+// Online C compiler to run C program online
+/******************************************************************************
 
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+/******************************************************************************
+
+                            Online C Compiler.
+                Code, Compile, Run and Debug C program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+// Online C compiler to run C program online
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -14,10 +29,10 @@ struct msgQue{
 
 int main(){
     //int numOfProcesses = 2;
-    int currentProcess = 0;
+    //int currentProcess = 0;
     int msgID;
     int msgCheck;
-    int running = 1;
+    //int running = 1;
     struct msgQue message;
     
     strcpy(message.msgText,"Sending failed:(");
@@ -25,53 +40,61 @@ int main(){
     int t;
 
     //while(currentProcess < numOfProcesses && running == 1){
-        t = fork();
-        
         msgID = msgget((key_t)t, 0666 | IPC_CREAT);
-        printf("CURRENT PROCESS: %d\n",currentProcess);
+        printf("msgID =  %d\n", msgID);
+        if(msgID == -1){
+            printf("Error making message queue\n");
+        }
         
-        while(1){ // While loop to continue sending and recieving until success
-            
-            if(msgID == -1){
-                printf("Error making message queue\n");
-                break;
-            }
-            else if(t < 0){
+        t = fork();
+        printf("Fork value: %d\n",t);
+        
+            if(t < 0){
                 printf("Error forking\n");
-                break;
             }else if(t == 0){
-                //sleep(0.1);
+                //sleep(3);
                 printf("Entering child process PID: %d\n", t);
-                msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,IPC_NOWAIT);
+                msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR);
                 if(msgCheck == -1){
                     printf("Error receiving message\n");
                 }
                 printf("Recieved message: %s\n",message.msgText);
                 if(strncmp(message.msgText, "Sending success!", 16) == 0){
                     printf("Success!\n");
-                    running = 0;
-                    break;
+                    //running = 0;
+                    //break;
                 }
-                msgctl(msgID, IPC_RMID, NULL);
                 
             }else{
-                sleep(0.5);
+                //sleep(1);
                 printf("Entering parent process PID: %d\n", t);
                 message.msgType = 1;
                 strcpy(message.msgText,"Sending success!");
+                printf("Size of msgText: %ld\n", sizeof(message.msgText));
+                printf("Size of msgText 2: %ld\n", sizeof(struct msgQue) - sizeof(long int));
                 msgCheck = msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0);
+                printf("msgType = %ld\n", message.msgType);
                 if(msgCheck == -1){
                     printf("Error sending message\n");
                 }else{
                     //running = 0;
-                    break;
+                    printf("MsgCheck = %d\n", msgCheck);
                 }
+                printf("\nMessage sent\n");
             }
-        } // end of success checking while loop
         //currentProcess++;
     //}
-
-    msgctl(msgID, IPC_RMID, NULL);
+    
+    
+    if(t == 0){
+        printf("Destroying msgqueueueueu\n");
+        int var = msgctl(msgID, IPC_RMID, NULL);
+        printf("\n%d\n", var);
+    }
+    printf("Process %d finished\n", t);
     return 0;
 }
+
+
+
 
