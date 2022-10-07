@@ -552,6 +552,12 @@ int main()
                 // Create struct to save options.txt file into
                 // DataTable optionsTable;
                 // readFile("options.txt", &optionsTable);
+                
+// Doug's main menu code ---------------------------------------------------------------
+//Group G
+//douglas.edmondson@okstate.edu
+//A20144821
+//This allows the client to choose what they want to do or see in the server
 
                 // Sends Main menu to client
                 send(newSocket, "Enter a selection: \n", strlen("Enter a selection: \n"), 0);

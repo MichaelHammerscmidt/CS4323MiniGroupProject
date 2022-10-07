@@ -12,115 +12,182 @@
 
 #include<stdlib.h>
 #include<stdio.h>
+#include<stdbool.h>
 #include<string.h>
 #include<unistd.h>
 #include<sys/types.h>
-#include <sys/wait.h>
+#include<sys/wait.h>
 #include<sys/ipc.h>
 #include<sys/msg.h>
-#include <fcntl.h>
+#include<fcntl.h>
+
+#define MAXCHAR 1000
 
 extern struct uniqueRecordStruct uniqueRecordArray;
 
-// int main() {
+int main() {
 
-//     char *filename = "bookInfo1.txt";
-//     char *column = "Stock";
-//     char *uniqueValue = "In stock";
+    char *filename = "bookInfo.txt";
+    char *column = "Stock";
+    char *uniqueValue = "In stock";
 
-//     int row = 0;
-//     int col = 0;
-
-// //     struct uniqueRecordStruct uniqueRecord = readFileByUniqueValue(filename,
-// //     column, uniqueValue);
+    struct uniqueRecordStruct recordArray = readFile(filename);
+    struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
   
-//     struct processDataStruct data;
+    // struct processDataStruct data;
     
-//     sendDataToParent(data);
+    // sendDataToParent(data);
   
-//     return 0;
+    return 0;
 
-// }
+}
 
-struct uniqueRecordStruct readFileByUniqueValue(char *filename, char *column,
-                                                char *uniqueValue) {
+struct uniqueRecordStruct readFile(char* filename) {
   int nRows = 705;
-  int nCols = 5;
+  int nCols = 6;
   int nValues = 300;
 
   if (strcmp(filename, "amazonBestsellers.txt") == 0) {
+    printf("Hey!\n");
     nRows = 555;
     nCols = 6;
   }
+  
+  struct uniqueRecordStruct uniqueRecordArray;
 
-  char ***recordArray = (char ***)malloc(nRows * sizeof(char **));
+  FILE *fp;
+  char row[MAXCHAR];
+  char *token;
 
-  for (int i = 0; i < nRows; i++) {
-    recordArray[i] = (char **)malloc(nCols * sizeof(char *));
+  fp = fopen(filename,"r");
 
-    for (int j = 0; j < nCols; j++) {
-      recordArray[i][j] = (char *)malloc(nValues * sizeof(char));
-    }
-  }
 
-  FILE *inFile = fopen(filename, "r");
-  if (!inFile) {
-    perror("fopen for reading");
-    exit(EXIT_FAILURE);
-  }
-
-  char *line = (char *)malloc(sizeof(char));
-  int row = 0;
-  int col = 0;
-
-  int columnIndex = 0;
-
-  while (fscanf(inFile, "%[^\n] ", line) != EOF) {
-    char *pt = strtok(line, ",");
-
-    col = 0;
-
-    int i = 0;
-    while (pt != NULL) {
-      if (row == 0 && strcmp(pt, column) == 0) {
-        columnIndex = i;
+  int row_count = 0;
+  int col_count = 0;
+  while (feof(fp) != true)
+  {
+      fgets(row, MAXCHAR, fp);
+//       printf("Row %d: %s", row_count, row);
+    
+      if (row[0] == '"') {
+          for (int i = 1; i < strlen(row); i++) {
+              if (row[i] == ',') {
+                  row[i] = ';';
+              }
+              if (row[i] == '"') {
+                  break;
+              }
+          }
       }
 
-      if (columnIndex != 0 && columnIndex == i &&
-          strcmp(pt, uniqueValue) != 0 && strcmp(pt, column) != 0) {
-        row--;
+      token = strtok(row, ",");
+
+      col_count = 0;
+      while(token != NULL)
+      {
+//           printf("Token: %s\n", token);
+          strcpy(uniqueRecordArray.recordArray[row_count][col_count], token);
+//           printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
+        
+          token = strtok(NULL, ",");
+          col_count++;
+      }
+
+    row_count++;
+  }
+  
+//   struct uniqueRecordStruct uniqueRecordArray;
+//   strcpy(uniqueRecordArray.uniqueValue, uniqueValue);
+  uniqueRecordArray.colSize = col_count;
+  uniqueRecordArray.rowSize = row_count;
+
+  return uniqueRecordArray;
+}
+
+char** getUniques(struct uniqueRecordStruct records, char* column, int* returned_size) {
+  int BUF_SIZE = 11;
+  char **uniqueArray = (char **)malloc(BUF_SIZE * sizeof(char *));
+
+  for (int i = 0; i < BUF_SIZE; i++) {
+    uniqueArray[i] = (char *)malloc(100 * sizeof(char));
+  }
+  
+  int colIndex = 0;
+  for (int i = 0; i < records.colSize; i++) {
+    if (strcmp(records.recordArray[0][i], column) == 0) {
+      colIndex = i;
+      printf("colIndex: %d\n", colIndex);
+      break;
+    }
+  }
+  
+  int countOfUnique = 0;
+  for (int i = 1; i < records.rowSize; i++) {
+    for (int j = 0; j < records.colSize; j++) {
+      
+      // Checks if the column is not the column we're interested in
+      if (j != colIndex) {
+        continue;
+      }
+      
+      // Checks if the unique value has been added to the array already
+      int added = 0;
+      for (int k = 0; k < BUF_SIZE; k++) {
+        if (strcmp(uniqueArray[k], records.recordArray[i][j]) == 0) {
+          added = 1;
+          break;
+        }
+      }
+
+      if (added == 0) {
+        uniqueArray[countOfUnique] = records.recordArray[i][j];
+//         printf("uniqueArray[%d] = %s\n", countOfUnique, uniqueArray[countOfUnique]);
+        countOfUnique++;
         break;
       }
-
-      if (columnIndex == 0 || columnIndex != i) {
-        for (int k = 0; k < strlen(pt); k++) {
-          recordArray[row][col][k] = pt[k];
-        }
-
-        col++;
-      }
-
-      pt = strtok(NULL, ",");
-      i++;
     }
+  }
+  
+  *returned_size = countOfUnique;
+  return uniqueArray;
+}
 
+struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct records, char* column, char* uniqueValue) {
+  int colIndex = 0;
+  for (int i = 0; i < records.colSize; i++) {
+    if (strcmp(records.recordArray[0][i], column) == 0) {
+      colIndex = i;
+      printf("colIndex: %d\n", colIndex);
+      break;
+    }
+  }
+  
+  struct uniqueRecordStruct uniqueRecordArray;
+  
+  int row = 0;
+  int col = 0;
+  for (int i = 0; i < records.rowSize; i++) {
+    if (i != 0 && strcmp(records.recordArray[i][colIndex], uniqueValue) != 0) {
+      continue;
+    }
+    
+    col = 0;
+    for (int j = 0; j < records.colSize; j++) {
+      if (j == colIndex) {
+        continue;
+      }
+      
+      strcpy(uniqueRecordArray.recordArray[row][col], records.recordArray[i][j]);
+      
+      printf("recordArray[%d][%d]: %s\n", row, col, uniqueRecordArray.recordArray[row][col]);
+      col++;
+    }
     row++;
   }
-
-  free(inFile);
-//   fclose(inFile);
-
-  struct uniqueRecordStruct uniqueRecordArray;
   strcpy(uniqueRecordArray.uniqueValue, uniqueValue);
-  uniqueRecordArray.colSize = nCols;
   uniqueRecordArray.rowSize = row;
-
-  for (int i = 0; i < row; i++) {
-    for (int j = 0; j < col; j++) {
-      strcpy(uniqueRecordArray.recordArray[i][j], recordArray[i][j]);
-    }
-  }
-
+  uniqueRecordArray.colSize = col;
+  
   return uniqueRecordArray;
 }
 
@@ -203,7 +270,9 @@ struct uniqueRecordStruct receiveDataFromProcess(char filename[20],
 
     rcv(uniqueValue);
 
-    struct uniqueRecordStruct uniqueRecord = readFileByUniqueValue(data.filename, data.column, data.uniqueValue);
+    struct uniqueRecordStruct recordArray = readFile(data.filename);
+    struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, data.column, data.uniqueValue);
 
     return uniqueRecord;
 }
+
