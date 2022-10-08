@@ -4,7 +4,7 @@
 #include "process_data_struct.h"
 
 struct uniqueRecordStruct readFile(char* filename);
-char** getUniques(struct uniqueRecordStruct records, char* column, int* returned_size);
+char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* returned_size);
 struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct records, char* column, char* uniqueValue);
 
 void snd(struct processDataStruct data);

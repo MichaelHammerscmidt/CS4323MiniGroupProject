@@ -700,4 +700,4 @@ Alice in Wonderland (Alice's Adventures in Wonderland #1),Classics,One,55.53,In 
 "Ajin Demi-Human, Volume 1 (Ajin Demi-Human #1)",Sequential Art,Four,57.06,Out of stock,0
 A Spy's Devotion (The Regency Spies of London #1),Historical Fiction,Five,16.97,Out of stock,0
 1st to Die (Women's Murder Club #1),Mystery,One,53.98,In stock,1
-"1,000 Places to See Before You Die",Travel,Five,26.08,Out of stock,0
+"1000 Places to See Before You Die",Travel,Five,26.08,Out of stock,0

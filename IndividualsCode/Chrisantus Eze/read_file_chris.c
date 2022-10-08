@@ -6,7 +6,7 @@
 // Haven't implemented the inter-process communication process yet. This is the
 // next item to be done
 
-#include "process_file.h"
+#include "read_file_chris.h"
 #include "unique_record_struct.h"
 #include "process_data_struct.h"
 
@@ -22,6 +22,8 @@
 #include<fcntl.h>
 
 #define MAXCHAR 1000
+
+extern struct uniqueRecordStruct uniqueRecordArray;
 
 extern struct uniqueRecordStruct uniqueRecordArray;
 
@@ -48,7 +50,6 @@ struct uniqueRecordStruct readFile(char* filename) {
   int nValues = 300;
 
   if (strcmp(filename, "amazonBestsellers.txt") == 0) {
-    printf("Hey!\n");
     nRows = 555;
     nCols = 6;
   }
@@ -67,7 +68,7 @@ struct uniqueRecordStruct readFile(char* filename) {
   while (feof(fp) != true)
   {
       fgets(row, MAXCHAR, fp);
-//       printf("Row %d: %s", row_count, row);
+      printf("Row %d: %s", row_count, row);
     
       if (row[0] == '"') {
           for (int i = 1; i < strlen(row); i++) {
@@ -87,7 +88,7 @@ struct uniqueRecordStruct readFile(char* filename) {
       {
 //           printf("Token: %s\n", token);
           strcpy(uniqueRecordArray.recordArray[row_count][col_count], token);
-//           printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
+          printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
         
           token = strtok(NULL, ",");
           col_count++;
@@ -104,7 +105,7 @@ struct uniqueRecordStruct readFile(char* filename) {
   return uniqueRecordArray;
 }
 
-char** getUniques(struct uniqueRecordStruct records, char* column, int* returned_size) {
+char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* returned_size) {
   int BUF_SIZE = 11;
   char **uniqueArray = (char **)malloc(BUF_SIZE * sizeof(char *));
 
@@ -116,7 +117,7 @@ char** getUniques(struct uniqueRecordStruct records, char* column, int* returned
   for (int i = 0; i < records.colSize; i++) {
     if (strcmp(records.recordArray[0][i], column) == 0) {
       colIndex = i;
-      printf("colIndex: %d\n", colIndex);
+//       printf("colIndex: %d\n", colIndex);
       break;
     }
   }
@@ -157,7 +158,7 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   for (int i = 0; i < records.colSize; i++) {
     if (strcmp(records.recordArray[0][i], column) == 0) {
       colIndex = i;
-      printf("colIndex: %d\n", colIndex);
+//       printf("colIndex: %d\n", colIndex);
       break;
     }
   }
@@ -179,7 +180,7 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
       
       strcpy(uniqueRecordArray.recordArray[row][col], records.recordArray[i][j]);
       
-      printf("recordArray[%d][%d]: %s\n", row, col, uniqueRecordArray.recordArray[row][col]);
+//       printf("recordArray[%d][%d]: %s\n", row, col, uniqueRecordArray.recordArray[row][col]);
       col++;
     }
     row++;
@@ -275,4 +276,3 @@ struct uniqueRecordStruct receiveDataFromProcess(char filename[20],
 
     return uniqueRecord;
 }
-
