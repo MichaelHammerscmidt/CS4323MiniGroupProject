@@ -26,7 +26,6 @@ int main(){
 
     while(currentProcess < numOfProcesses && running == 1){
         msgID = msgget((key_t)t, 0666 | IPC_CREAT);
-        //printf("msgID =  %d\n", msgID);
         if(msgID == -1){
             printf("Error making message queue\n");
         }
@@ -37,7 +36,6 @@ int main(){
             if(t < 0){
                 printf("Error forking\n");
             }else if(t == 0){
-                //sleep(3);
                 printf("Entering child process PID: %d\n", t);
                 msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR);
                 if(msgCheck == -1){
@@ -47,32 +45,22 @@ int main(){
                 if(strncmp(message.msgText, "Sending success!", 16) == 0){
                     printf("Success!\n");
                     running = 0;
-                    //break;
                 }
-                
-                //TODO: Christian's logic
-                
             }else{
-                //sleep(1);
                 printf("Entering parent process PID: %d\n", t);
                 message.msgType = 1;
                 strcpy(message.msgText,"Sending success!");
                 //printf("Size of msgText: %ld\n", sizeof(message.msgText));
-                //printf("Size of msgText 2: %ld\n", sizeof(struct msgQue) - sizeof(long int));
                 msgCheck = msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0);
                 //printf("msgType = %ld\n", message.msgType);
                 if(msgCheck == -1){
                     printf("Error sending message\n");
-                }else{
-                    //running = 0;
-                    //printf("MsgCheck = %d\n", msgCheck);
                 }
                 printf("\nMessage sent\n");
             }
         currentProcess++;
         printf("Process %d finished\n", t);
     }
-    
     
     if(t == 0){
         int var = msgctl(msgID, IPC_RMID, NULL);
