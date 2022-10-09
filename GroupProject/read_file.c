@@ -32,7 +32,15 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 //     char *uniqueValue = "In stock";
 
 //     struct uniqueRecordStruct recordArray = readFile(filename);
-//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+// //     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+  
+    
+// //     for (int i = 1; i < recordArray.rowSize; i++) {
+// //       for (int j = 0; j < recordArray.colSize; j++) { 
+// //           printf("%s ", recordArray.recordArray[i][j]);
+// //       }
+// //       printf("---------------------------------\n");
+// //     }
   
 //     // struct processDataStruct data;
     
@@ -43,7 +51,7 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 // }
 
 struct uniqueRecordStruct readFile(char* filename) {
-  int nRows = 705;
+  int nRows = 710;
   int nCols = 6;
   int nValues = 300;
 
@@ -52,7 +60,7 @@ struct uniqueRecordStruct readFile(char* filename) {
     nCols = 6;
   }
   
-  struct uniqueRecordStruct uniqueRecordArray;
+  struct uniqueRecordStruct record;
 
   FILE *fp;
   char row[MAXCHAR];
@@ -66,8 +74,9 @@ struct uniqueRecordStruct readFile(char* filename) {
   while (feof(fp) != true)
   {
       fgets(row, MAXCHAR, fp);
-      // printf("Row %d: %s", row_count, row);
+//       printf("Row %d: %s", row_count, row);
     
+      //This replaces any occurrence of ',' in between a double quotation with a ';'
       if (row[0] == '"') {
           for (int i = 1; i < strlen(row); i++) {
               if (row[i] == ',') {
@@ -85,8 +94,8 @@ struct uniqueRecordStruct readFile(char* filename) {
       while(token != NULL)
       {
 //           printf("Token: %s\n", token);
-          strcpy(uniqueRecordArray.recordArray[row_count][col_count], token);
-          // printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
+          strcpy(record.recordArray[row_count][col_count], token);
+//           printf("record[%d][%d]: %s\n", row_count, col_count, record.recordArray[row_count][col_count]);
         
           token = strtok(NULL, ",");
           col_count++;
@@ -95,10 +104,15 @@ struct uniqueRecordStruct readFile(char* filename) {
     row_count++;
   }
   
-//   struct uniqueRecordStruct uniqueRecordArray;
-//   strcpy(uniqueRecordArray.uniqueValue, uniqueValue);
-  uniqueRecordArray.colSize = col_count;
-  uniqueRecordArray.rowSize = row_count;
+  record.colSize = col_count;
+  record.rowSize = row_count;
+  
+//   for (int i = 1; i < record.rowSize; i++) {
+//     for (int j = 0; j < record.colSize; j++) { 
+//         printf("%s ", record.recordArray[i][j]);
+//     }
+//     printf("---------------------------------\n");
+//   }
 
   return uniqueRecordArray;
 }
@@ -161,12 +175,20 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
     }
   }
   
+  for (int i = 1; i < records.rowSize; i++) {
+    for (int j = 0; j < records.colSize; j++) { 
+        printf("%s ", records.recordArray[i][j]);
+    }
+    printf("---------------------------------\n");
+  }
+  
   struct uniqueRecordStruct uniqueRecordArray;
   
   int row = 0;
   int col = 0;
   for (int i = 0; i < records.rowSize; i++) {
     if (i != 0 && strcmp(records.recordArray[i][colIndex], uniqueValue) != 0) {
+//       printf("Row %d: %s\n", i, records.recordArray[i][4]);
       continue;
     }
     

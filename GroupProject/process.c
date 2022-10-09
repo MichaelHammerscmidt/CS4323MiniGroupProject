@@ -1,5 +1,6 @@
 #include "process.h"
 #include "read_file.c"
+#include "pipe.c"
 #include "unique_record_struct.h"
 
 #include <stdio.h>
@@ -27,16 +28,17 @@ int main(){
 }
 
 void manageIPC(char* filename, char* column) {
-  int numOfProcesses = 1;
+  int numOfProcesses = 2;
   int currentProcess = 0;
   int msgID;
   int msgCheck;
   int running = 1;
 
-  struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
+  struct uniqueRecordStruct recordArray = readFile(filename);
 
   int numUniqueValues = 0;
-  char** uniqueValueArray = getUniques(recordArray, column, &numUniqueValues);
+  char** uniqueValueArray = getUniqueValues(recordArray, column, &numUniqueValues);
+
   int count = 0;
 
 //   strcpy(message.msgText,"Sending failed:(");
@@ -53,18 +55,18 @@ void manageIPC(char* filename, char* column) {
       t = fork();
       printf("Fork value: %d\n",t);
 
-          if(t < 0){
-              printf("Error forking\n");
-          }else if(t == 0){
-           
-            running = handleChildProcess(msgID, recordArray, column, t);
+      if(t < 0){
+          printf("Error forking\n");
+      }else if(t == 0){
 
-          }else{
-              char* uniqueValue = uniqueValueArray[count];
-              handleParentProcess(msgID, uniqueValue, t);
+        running = handleChildProcess(msgID, recordArray, column, t);
 
-              count++;
-          }
+      }else{
+          char* uniqueValue = uniqueValueArray[count];
+          handleParentProcess(msgID, uniqueValue, t);
+
+          count++;
+      }
       currentProcess++;
       printf("Process %d finished\n", t);
   }
@@ -91,6 +93,8 @@ int handleChildProcess(int msgID, struct uniqueRecordStruct recordArray, char* c
   struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, message.msgText);
 
   printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
+  
+  sendDataViaPipe(uniqueRecord.uniqueValue, uniqueRecord);
 
   if(msgCheck != -1){
       printf("Success!\n");
@@ -114,4 +118,6 @@ void handleParentProcess(int msgID, char* uniqueValue, int t) {
       printf("Error sending message\n");
   }
   printf("\nMessage sent\n");
+  
+  receiveDataViaPipe(uniqueValue);
 }
