@@ -158,10 +158,10 @@ int main(){
                     currentProcess++;
                     printf("Process %d finished\n", t);
 
-                    //if the process is a child process deletes the message queue it was using 
+                    //if the process is a child ands it has recieved its message deletes the message queue it was using
                     if(t == 0 && running == 0){
                         int var = msgctl(msgID, IPC_RMID, NULL);
-                        printf("Pipe Destoryed %d\n", var);
+                        printf("Message Queue Destoryed %d\n", var);
                     }
                 }
  
