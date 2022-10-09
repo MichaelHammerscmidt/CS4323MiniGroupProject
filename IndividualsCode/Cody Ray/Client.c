@@ -43,8 +43,6 @@ int main(){
     }
     printf("Successfully Connected To Server\n");
 
-    send(clientSocket,".", strlen("."),0);
-
     //infinite loop which handles the rest of the client server connections
     while(1){
         //scans user input and sends it to the server

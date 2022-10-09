@@ -57,10 +57,11 @@ int main(){
     //infinite loop to handle the rest of the server client connections and communication
     while(1){
         //return point for the child processes once their client disconnects
-        ReturnToHere:
+        
         //creates a new server socket for future clients to connect to
         newSocket = accept(serverSocket, (struct sockaddr*)&newServerAddress, &newServerAddressSize);
         if(newSocket < 0){
+            printf("Error Creating Child Socket\n");
             return 0;
         }
         printf("Connection made on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
@@ -72,12 +73,11 @@ int main(){
             while(1){
                 //receives messages from the client
                 recv(newSocket, buffer, 512, 0);
-                //checks to make sure the client has not exited and if it has breaks out of the loop that controls child processes
+                //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
                 if(strcmp(buffer, "exit") == 0){
+                    close(newSocket);
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-                    //temporary return point for the child process to break the loop with the current connected client
-                    //dont think this is the correct way to kill the child process
-                    goto ReturnToHere;
+                    return 0;
                 }else{
                     //displays what the client has sent to the server
                     printf("Client sent: %s\n", buffer);
