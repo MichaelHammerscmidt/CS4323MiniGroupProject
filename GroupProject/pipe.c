@@ -1,4 +1,4 @@
-#include "read_file.c"
+// #include "read_file.c"
 #include "unique_record_struct.h"
 #include <stdio.h>  // Baisc standard I/O like printf
 #include <unistd.h>  // defines standard symbolic constants and types
@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <string.h>
 
-#define MAX 90//9000000000 // 9 billion times
+#define MAX 900000 // 9 billion times
 
 #define MAX_RECORD_STRING 80000
 
@@ -20,28 +20,29 @@ void receiveDataViaPipe(char* myPipe);
 // char* concatenate(char recordRow[7][300], int col);
 char* concatenate(char recordArray[700][7][300], int row, int col);
 
-int main() {
+// int main() {
     
-//     int pid = fork();
-//     if (pid < 0) {
-//         printf("There was an error creating the process\n");
-//         return 0;
-//     }
+// //     int pid = fork();
+// //     if (pid < 0) {
+// //         printf("There was an error creating the process\n");
+// //         return 0;
+// //     }
 
-//     if (pid == 0) {
-//         sendDataViaPipe(myPipe);
-//     } else {
-//         receiveDataViaPipe(myPipe);
-//     }
+// //     if (pid == 0) {
+// //         sendDataViaPipe(myPipe);
+// //     } else {
+// //         receiveDataViaPipe(myPipe);
+// //     }
   
-    struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
+//     struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
 
-    struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
+//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
 
-    char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-    printf("The master string is %s\n", recordString);
-    return 0;
-}
+//     char recordString[MAX_RECORD_STRING] = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
+//     printf("The array:%sC\n", recordString);
+
+//     return 0;
+// }
 
 void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord) {
     int fd; // file descriptor
@@ -59,21 +60,25 @@ void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord) {
         printf("1: Error opening..");
     }
 
-//     for (int i = 0; i < 4; i++) {
-//       char* recordString = concatenate(uniqueRecord.recordArray[], uniqueRecord.rowSize, uniqueRecord.colSize);
-//       if (write(fd, &recordString, sizeof((char*)900000) < 0) {// Write on the FIFO
+//     for (int i = 0; i < 10; i++) {
+//       char* recordString = concatenate(uniqueRecord.recordArray[i], uniqueRecord.colSize);
+// //       printf("%s\n", recordString);
+//       if (write(fd, &recordString, sizeof((char*)900000)) < 0) {// Write on the FIFO
 //           printf("1: Error writing..");
 //       }
 //     }
   
-    char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-//     char* temp = (char*)malloc(800000 * sizeof(char));
+    char* myArray = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
   
-    char temp[800000];
+//     strcat(recordString, "\n");
+//     char* temp = strtok(recordString, "\n");
   
-    strcpy(temp, recordString);
-//     printf("The master string is-%s\n", temp);
-    if (write(fd, &temp, sizeof((char*)900000)) < 0) {// Write on the FIFO
+    char temp[MAX_RECORD_STRING];
+
+  
+    strcpy(temp, myArray);
+//     printf("%s", temp);
+    if (write(fd, &temp, sizeof(char[900000])) < 0) {// Write on the FIFO
         printf("1: Error writing..");
     }
     close(fd);  // Close the pipe
@@ -95,18 +100,21 @@ void receiveDataViaPipe(char* myPipe) {
         printf("2: Error opening..");
     }
   
-//     char* recordString = (char*)malloc(800000 * sizeof(char));
+    char recordString[MAX_RECORD_STRING];
   
-       char recordString[800000];
+//     char* recordString = (char*)malloc(900000 * sizeof(char));
 
-//     for (int i = 0; i < 4; i++) {
+
+//     for (int i = 0; i < 10; i++) {
+//       char* recordString = (char*)malloc(900000 * sizeof(char));
+
 //       if (read(fd, &recordString, sizeof(char*)) < 0) { // Read from FIFO 
 //         printf("2: Error reading..");
 //       }
 //       printf("The received message is: %s\n", recordString);
 //     }
   
-    if (read(fd, &recordString, sizeof((char*)900000)) < 0) { // Read from FIFO 
+    if (read(fd, &recordString, sizeof(char[900000])) < 0) { // Read from FIFO 
       printf("2: Error reading..");
     }
     printf("The received message is: %s\n", recordString);
@@ -115,21 +123,28 @@ void receiveDataViaPipe(char* myPipe) {
 
 // char* concatenate(char recordRow[7][300], int col) {  
 //   char* recordString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));
-  
-// //   printf("row %d, col %d\n", row, col);
 
 //   for (int i = 0; i < col; i++) {
+//     if (recordRow[i][0] == '"') {
+//         for (int k = 0; k <= strlen(recordRow[i]); k++) {
+//             if (recordRow[i][k] == '"') {
+//                 recordRow[i][k] = ' ';
+// //               printf("Here: %s\n", recordArray[i][j]);
+//             }
+//         }
+//       }
 //     strcat(recordString, recordRow[i]);
-//     if (j < col - 1) {
-//       strcat(slaveString, "|");
+//     if (i < col - 1) {
+//       strcat(recordString, "|");
 //     }
+//     recordString[ strcspn( recordString, "\n" ) ] = ' ';
 //   }
-//   printf("The slave string is %s\n", recordString);
+// //   printf("The slave string is %s\n", recordString);
 //   return recordString;
 // }
 
 
-char* concatenate(char recordArray[700][7][300], int row, int col) {  
+char* concatenate(char recordArray[705][7][300], int row, int col) {  
   char* masterString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));
 
   char* slaveString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));
@@ -158,3 +173,10 @@ char* concatenate(char recordArray[700][7][300], int row, int col) {
   }
   return masterString;
 }
+
+
+
+
+
+
+
