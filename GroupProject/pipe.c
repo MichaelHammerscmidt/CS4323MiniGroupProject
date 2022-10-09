@@ -1,5 +1,6 @@
 // #include "read_file.c"
 #include "unique_record_struct.h"
+#include "pipe.h"
 #include <stdio.h>  // Baisc standard I/O like printf
 #include <unistd.h>  // defines standard symbolic constants and types
 #include <sys/types.h>  // basic derived types like pid_t
@@ -15,10 +16,6 @@
 #define MAX_RECORD_STRING 80000
 
 char myPipe[] = "./NamedPipe";  // FIFO file path 
-void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord);
-void receiveDataViaPipe(char* myPipe);
-// char* concatenate(char recordRow[7][300], int col);
-char* concatenate(char recordArray[700][7][300], int row, int col);
 
 // int main() {
     
@@ -38,8 +35,10 @@ char* concatenate(char recordArray[700][7][300], int row, int col);
 
 //     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
 
-//     char recordString[MAX_RECORD_STRING] = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-//     printf("The array:%sC\n", recordString);
+//     char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
+// //     printf("The array:%sC\n", recordString);
+  
+//     struct uniqueRecordStruct newRecord = unwrap(recordString);
 
 //     return 0;
 // }
@@ -84,7 +83,7 @@ void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord) {
     close(fd);  // Close the pipe
 }
 
-void receiveDataViaPipe(char* myPipe) {
+struct uniqueRecordStruct receiveDataViaPipe(char* myPipe) {
     int fd; // file descriptor
     long long int result = 0; // computing results for addition
     long long int finalResult; // computing final results for addition
@@ -102,23 +101,15 @@ void receiveDataViaPipe(char* myPipe) {
   
     char recordString[MAX_RECORD_STRING];
   
-//     char* recordString = (char*)malloc(900000 * sizeof(char));
-
-
-//     for (int i = 0; i < 10; i++) {
-//       char* recordString = (char*)malloc(900000 * sizeof(char));
-
-//       if (read(fd, &recordString, sizeof(char*)) < 0) { // Read from FIFO 
-//         printf("2: Error reading..");
-//       }
-//       printf("The received message is: %s\n", recordString);
-//     }
-  
     if (read(fd, &recordString, sizeof(char[900000])) < 0) { // Read from FIFO 
       printf("2: Error reading..");
     }
-    printf("The received message is: %s\n", recordString);
+  
+    struct uniqueRecordStruct record = unwrap(recordString);
+    printf("The received message is: %d\n", record.rowSize);
     close(fd);  // Close the pipe
+  
+    return record;
 }
 
 // char* concatenate(char recordRow[7][300], int col) {  
@@ -153,6 +144,7 @@ char* concatenate(char recordArray[705][7][300], int row, int col) {
     strcpy(slaveString, "");
     for (int j = 0; j < col; j++) {
       
+      // This replaces all occurrences of '"' with a whitespace
       if (recordArray[i][j][0] == '"') {
         for (int k = 0; k <= strlen(recordArray[i][j]); k++) {
             if (recordArray[i][j][k] == '"') {
@@ -174,9 +166,45 @@ char* concatenate(char recordArray[705][7][300], int row, int col) {
   return masterString;
 }
 
+struct uniqueRecordStruct unwrap(char* arrayString) {
+  
+    char rowArray[700][300];
 
+    // Tokenize the character array by '@' and store the tokens in a 2D array
+    char* row = strtok(arrayString, "@");
+    int row_count = 0;
+    while(row != NULL) {
+//       printf("Length: %ld, Row: %s\n", strlen(row), row);
 
+      strcpy(rowArray[row_count], row);
+      row = strtok(NULL, "@");
+      row_count++;
+    }
 
+    struct uniqueRecordStruct record;
+
+    // Loop through the 2D array, tokenize each row by '|' and store the tokens in the struct's 3D array
+    int col_count = 0;
+    for (int i = 0; i < row_count; i++) {
+      char* col = strtok(rowArray[i], "|");
+      col_count = 0;
+      
+      while(col != NULL) {
+//         printf("Length: %ld, Col: %s\n", strlen(col), col);
+
+        strcpy(record.recordArray[i][col_count], col);
+//         printf("record[%d][%d]: %s\n", i, col_count, record.recordArray[i][col_count]);
+        
+        col = strtok(NULL, "|");
+        col_count++;
+      }
+    }
+  
+    record.colSize = col_count;
+    record.rowSize = row_count;
+  
+    return record;
+}
 
 
 

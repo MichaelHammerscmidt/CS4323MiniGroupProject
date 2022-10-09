@@ -119,5 +119,6 @@ void handleParentProcess(int msgID, char* uniqueValue, int t) {
   }
   printf("\nMessage sent\n");
   
-  receiveDataViaPipe(uniqueValue);
+  struct uniqueRecordStruct record = receiveDataViaPipe(uniqueValue);
+  strcpy(record.uniqueValue, uniqueValue);
 }
