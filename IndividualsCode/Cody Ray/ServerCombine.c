@@ -66,10 +66,11 @@ int main(){
     //infinite loop to handle the rest of the server client connections and communication
     while(1){
         //return point for the child processes once their client disconnects
-        ReturnToHere:
-        //creates a new server socket for future clients to connect to
+        
+        //creates a new server socket for future clients to connect to and sends an error message if something is wrong
         newSocket = accept(serverSocket, (struct sockaddr*)&newServerAddress, &newServerAddressSize);
         if(newSocket < 0){
+            printf("Error Creating Child Socket\n");
             return 0;
         }
         printf("Connection made on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
@@ -79,6 +80,7 @@ int main(){
             //closes the main port that clients use to connect in the child processes
             close(serverSocket);
 
+            //values that we use for the message que
             int numOfProcesses = 3;
             int currentProcess = 0;
             int msgID;
@@ -91,16 +93,13 @@ int main(){
             while(1){
                 //receives messages from the client
                 recv(newSocket, buffer, 512, 0);
-                //checks to make sure the client has not exited and if it has breaks out of the loop that controls child processes
+                //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
                 if(strcmp(buffer, "exit") == 0){
+                    close(newSocket);
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-                    //temporary return point for the child process to break the loop with the current connected client
-                    //dont think this is the correct way to kill the child process
-                    if(childProcessID == 0){
-                        exit(0);
-                    }
-                    goto ReturnToHere;
-                }else{
+                    return 0;
+                    
+                }else if(strlen(buffer) > 0){
                     //displays what the client has sent to the server
                     printf("Client sent: %s\n", buffer);
                     //sends the message back to the client
@@ -109,48 +108,63 @@ int main(){
                     bzero(buffer,sizeof(buffer));
                 }
 
+                //loop to create the number of child processes we need to 
                 while(currentProcess < numOfProcesses && running == 1){
+                    //creates a message queue
                     msgID = msgget((key_t)t, 0666 | IPC_CREAT);
+                    //makes sure there where no problems in the message queue creation
                     if(msgID == -1){
                         printf("Error making message queue\n");
                     }
         
+                    //creates a child process and prints the PID
                     t = fork();
                     printf("Fork value: %d\n",t);
         
+                    //makes sure there where no errors while forking.
                     if(t < 0){
                         printf("Error forking\n");
-                    }else if(t == 0){
+                        return 0;
+                    }else if(t == 0){ //child process
                         printf("Entering child process PID: %d\n", t);
+                        //checks the message queue for a message
                         msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR);
+                        //makes sure there where no errors recieving the message
                         if(msgCheck == -1){
                             printf("Error receiving message\n");
                         }
+                        //prints out the recieved message
                         printf("Recieved message: %s\n",message.msgText);
+                        //determines if the message is the correct message
                         if(strncmp(message.msgText, "Sending success!", 16) == 0){
                             printf("Success!\n");
+                            //breaks the child process out of the loop after it has recieved its message so it doesnt fork and create children as well
                             running = 0;
                         }
-                    }else{
+                    }else{ //parent process
                         printf("Entering parent process PID: %d\n", t);
                         message.msgType = 1;
+                        //copies the message into the value we are passing in the queue
                         strcpy(message.msgText,"Sending success!");
-                        //printf("Size of msgText: %ld\n", sizeof(message.msgText));
+                        //sends the current message to the message queue
                         msgCheck = msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0);
-                        //printf("msgType = %ld\n", message.msgType);
+                        //makes sure there where no errors sending the message
                         if(msgCheck == -1){
                             printf("Error sending message\n");
                         }
                         printf("\nMessage sent\n");
                     }
+                    //iterates through the loop to create a new process and print when processes are finished
                     currentProcess++;
                     printf("Process %d finished\n", t);
+
+                    //if the process is a child ands it has recieved its message deletes the message queue it was using 
+                    if(t == 0 && running == 0){
+                        int var = msgctl(msgID, IPC_RMID, NULL);
+                        printf("Message Queue Destoryed %d\n", var);
+                    }
                 }
  
-                if(t == 0){
-                    int var = msgctl(msgID, IPC_RMID, NULL);
-                    printf("\nDestoryed %d\n", var);
-                }
             }
         }
     }
