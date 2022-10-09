@@ -58,23 +58,11 @@ void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord) {
     if ((fd = open(myPipe, O_WRONLY | O_CREAT)) < 0) {  // Open FIFO for write only
         printf("1: Error opening..");
     }
-
-//     for (int i = 0; i < 10; i++) {
-//       char* recordString = concatenate(uniqueRecord.recordArray[i], uniqueRecord.colSize);
-// //       printf("%s\n", recordString);
-//       if (write(fd, &recordString, sizeof((char*)900000)) < 0) {// Write on the FIFO
-//           printf("1: Error writing..");
-//       }
-//     }
   
     char* myArray = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-  
-//     strcat(recordString, "\n");
-//     char* temp = strtok(recordString, "\n");
-  
+ 
     char temp[MAX_RECORD_STRING];
 
-  
     strcpy(temp, myArray);
 //     printf("%s", temp);
     if (write(fd, &temp, sizeof(char[900000])) < 0) {// Write on the FIFO
@@ -111,29 +99,6 @@ struct uniqueRecordStruct receiveDataViaPipe(char* myPipe) {
   
     return record;
 }
-
-// char* concatenate(char recordRow[7][300], int col) {  
-//   char* recordString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));
-
-//   for (int i = 0; i < col; i++) {
-//     if (recordRow[i][0] == '"') {
-//         for (int k = 0; k <= strlen(recordRow[i]); k++) {
-//             if (recordRow[i][k] == '"') {
-//                 recordRow[i][k] = ' ';
-// //               printf("Here: %s\n", recordArray[i][j]);
-//             }
-//         }
-//       }
-//     strcat(recordString, recordRow[i]);
-//     if (i < col - 1) {
-//       strcat(recordString, "|");
-//     }
-//     recordString[ strcspn( recordString, "\n" ) ] = ' ';
-//   }
-// //   printf("The slave string is %s\n", recordString);
-//   return recordString;
-// }
-
 
 char* concatenate(char recordArray[705][7][300], int row, int col) {  
   char* masterString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));

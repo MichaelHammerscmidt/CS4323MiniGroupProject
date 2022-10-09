@@ -107,13 +107,6 @@ struct uniqueRecordStruct readFile(char* filename) {
   record.colSize = col_count;
   record.rowSize = row_count;
   
-//   for (int i = 1; i < record.rowSize; i++) {
-//     for (int j = 0; j < record.colSize; j++) { 
-//         printf("%s ", record.recordArray[i][j]);
-//     }
-//     printf("---------------------------------\n");
-//   }
-
   return uniqueRecordArray;
 }
 
@@ -175,13 +168,6 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
     }
   }
   
-  for (int i = 1; i < records.rowSize; i++) {
-    for (int j = 0; j < records.colSize; j++) { 
-        printf("%s ", records.recordArray[i][j]);
-    }
-    printf("---------------------------------\n");
-  }
-  
   struct uniqueRecordStruct uniqueRecordArray;
   
   int row = 0;
@@ -212,6 +198,7 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   return uniqueRecordArray;
 }
 
+/*
 void msgsnd_(int msgid, struct processDataStruct data, int size, int pms) {
     snd(data);
 }
@@ -296,3 +283,4 @@ struct uniqueRecordStruct receiveDataFromProcess(char filename[20],
 
     return uniqueRecord;
 }
+*/
