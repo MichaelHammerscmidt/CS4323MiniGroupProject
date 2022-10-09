@@ -25,22 +25,22 @@
 
 extern struct uniqueRecordStruct uniqueRecordArray;
 
-int main() {
+// int main() {
 
-    char *filename = "bookInfo.txt";
-    char *column = "Stock";
-    char *uniqueValue = "In stock";
+//     char *filename = "bookInfo.txt";
+//     char *column = "Stock";
+//     char *uniqueValue = "In stock";
 
-    struct uniqueRecordStruct recordArray = readFile(filename);
-    struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+//     struct uniqueRecordStruct recordArray = readFile(filename);
+//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
   
-    // struct processDataStruct data;
+//     // struct processDataStruct data;
     
-    // sendDataToParent(data);
+//     // sendDataToParent(data);
   
-    return 0;
+//     return 0;
 
-}
+// }
 
 struct uniqueRecordStruct readFile(char* filename) {
   int nRows = 705;
@@ -66,7 +66,7 @@ struct uniqueRecordStruct readFile(char* filename) {
   while (feof(fp) != true)
   {
       fgets(row, MAXCHAR, fp);
-      printf("Row %d: %s", row_count, row);
+      // printf("Row %d: %s", row_count, row);
     
       if (row[0] == '"') {
           for (int i = 1; i < strlen(row); i++) {
@@ -86,7 +86,7 @@ struct uniqueRecordStruct readFile(char* filename) {
       {
 //           printf("Token: %s\n", token);
           strcpy(uniqueRecordArray.recordArray[row_count][col_count], token);
-          printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
+          // printf("recordArray[%d][%d]: %s\n", row_count, col_count, uniqueRecordArray.recordArray[row_count][col_count]);
         
           token = strtok(NULL, ",");
           col_count++;
