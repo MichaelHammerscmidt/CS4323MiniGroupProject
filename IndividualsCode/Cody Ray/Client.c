@@ -43,6 +43,9 @@ int main(){
     }
     printf("Successfully Connected To Server\n");
 
+    //resets the buffer to all null values
+    bzero(buffer,sizeof(buffer));
+
     //infinite loop which handles the rest of the client server connections
     while(1){
         //scans user input and sends it to the server
