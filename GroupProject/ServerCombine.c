@@ -379,9 +379,9 @@ int main(){
 //         }
       
       
-        strcpy(filename, "bookInfo.txt");
-        strcpy(column, "Stock");
-        strcpy(uniqueValue, "In stock");
+        strcpy(filename, "amazonBestsellers.txt");
+        strcpy(column, "Genre");
+        strcpy(uniqueValue, "Fiction");
         
         // Read the file and save into the struct.
         struct uniqueRecordStruct uniqueRecordArray = readFile(filename);

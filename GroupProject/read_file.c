@@ -28,27 +28,22 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 // int main() {
 
 //     char *filename = "amazonBestsellers.txt";
-//     char *column = "Year";
-//     char *uniqueValue = "In stock";
+//     char *column = "Genre";
+//     char *uniqueValue = "Fiction";
 
 //     struct uniqueRecordStruct recordArray = readFile(filename);
   
 //     int numberOfUniques = 0;
 //     char** uniqueArray = getUniqueValues(recordArray, column, &numberOfUniques);
-// //     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
     
     
-// //     for (int i = 1; i < recordArray.rowSize; i++) {
-// //       for (int j = 0; j < recordArray.colSize; j++) { 
-// //           printf("%s ", recordArray.recordArray[i][j]);
+// //     for (int i = 0; i < uniqueRecord.rowSize; i++) {
+// //       for (int j = 0; j < uniqueRecord.colSize; j++) { 
+// //           printf("%s ", uniqueRecord.recordArray[i][j]);
 // //       }
 // //       printf("---------------------------------\n");
 // //     }
-  
-//     // struct processDataStruct data;
-    
-//     // sendDataToParent(data);
-  
 //     return 0;
 
 // }
@@ -110,7 +105,7 @@ struct uniqueRecordStruct readFile(char* filename) {
       
 //     printf("row_count %d\n", row_count);
 
-    row_count++;
+      row_count++;
   }
   
   record.colSize = col_count;
@@ -177,7 +172,7 @@ char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* ret
 struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct records, char* column, char* uniqueValue) {
   int colIndex = 0;
   for (int i = 0; i < records.colSize; i++) {
-    if (strcmp(records.recordArray[0][i], column) == 0) {
+    if (strncmp(records.recordArray[0][i], column, strlen(column)) == 0) {
       colIndex = i;
 //       printf("colIndex: %d\n", colIndex);
       break;
@@ -189,8 +184,8 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   int row = 0;
   int col = 0;
   for (int i = 0; i < records.rowSize; i++) {
-    if (i != 0 && strcmp(records.recordArray[i][colIndex], uniqueValue) != 0) {
-//       printf("Row %d: %s\n", i, records.recordArray[i][4]);
+    if (i != 0 && strncmp(records.recordArray[i][colIndex], uniqueValue, strlen(uniqueValue)) != 0) {
+//       printf("Row %d: %s\n", i, records.recordArray[i][6]);
       continue;
     }
     
