@@ -86,7 +86,7 @@ int main(){
             bool mainMenu = true;
             int currentRecievedMsg = 0;
 
-            //while loop that 
+            //while loop that handles the main menu
             while(mainMenu){
                 //loop which handles telling the client what to input
                 bzero(buffer,sizeof(buffer));
@@ -265,7 +265,6 @@ int main(){
                         printf("Message Queue Destoryed %d\n", var);
                     }
                 }
- 
             }
         }
     }
