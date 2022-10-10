@@ -1,10 +1,8 @@
 // Group Name: Group G
 // Name: Chrisantus Eze
 // Email: chrisantus.eze@okstate.edu
-// Date: 09/25
-// The logic to enable the server communicate with processes
-// Haven't implemented the inter-process communication process yet. This is the
-// next item to be done
+// Date: 10/10
+// The logic to that handles file retrieval and processing
 
 #include "read_file.h"
 #include "unique_record_struct.h"
@@ -48,6 +46,13 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 
 // }
 
+
+/**
+ * @brief This opens, reads and saves the content of the file in a struct
+ * 
+ * @param filename name of the file
+ * @return struct uniqueRecordStruct the returned struct containing all contents of the file.
+ */
 struct uniqueRecordStruct readFile(char* filename) {
   int nRows = 710;
   int nCols = 6;
@@ -64,7 +69,7 @@ struct uniqueRecordStruct readFile(char* filename) {
   char row[MAXCHAR];
   char *token;
 
-  fp = fopen(filename,"r");
+  fp = fopen(filename, "r");
 
 
   int row_count = 0;
@@ -86,12 +91,15 @@ struct uniqueRecordStruct readFile(char* filename) {
           }
       }
 
+      // Tokenizes the row
       token = strtok(row, ",");
 
       col_count = 0;
       while(token != NULL)
       {
 //           printf("Token: %s\n", token);
+
+          // Saves each column in the array
           strcpy(record.recordArray[row_count][col_count], token);
 //           printf("record[%d][%d]: %s\n", row_count, col_count, record.recordArray[row_count][col_count]);
         
@@ -99,6 +107,8 @@ struct uniqueRecordStruct readFile(char* filename) {
           col_count++;
       }
     
+      // This helped fix a bug in the amazonBestsellers file where for some reason an extra col was getting retrieved even 
+      // when it is not contained in the file
       if (strcmp(filename, "amazonBestsellers.txt") == 0 && row_count >= 549) {
         break;
       }
@@ -121,6 +131,14 @@ struct uniqueRecordStruct readFile(char* filename) {
   return record;
 }
 
+/**
+ * @brief Get the Unique Values in an array
+ * 
+ * @param records the record retrieved in readFile function
+ * @param column the column we're interested in
+ * @param returned_size this allows us send back the size of the unique values array
+ * @return char** this is the unique values array
+ */
 char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* returned_size) {
   int BUF_SIZE = 11;
   char **uniqueArray = (char **)malloc(BUF_SIZE * sizeof(char *));
@@ -129,6 +147,7 @@ char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* ret
     uniqueArray[i] = (char *)malloc(100 * sizeof(char));
   }
   
+  // We get the index of the column we're interested in
   int colIndex = 0;
   for (int i = 0; i < records.colSize; i++) {
     if (strncmp(records.recordArray[0][i], column, strlen(column)) == 0) {
@@ -169,7 +188,17 @@ char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* ret
   return uniqueArray;
 }
 
+/**
+ * @brief Get the Records By Unique Value
+ * 
+ * @param records the record retrieved in readFile function
+ * @param column the column we're interested in
+ * @param uniqueValue 
+ * @return struct uniqueRecordStruct 
+ */
 struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct records, char* column, char* uniqueValue) {
+  
+  // We get the index of the column we're interested in
   int colIndex = 0;
   for (int i = 0; i < records.colSize; i++) {
     if (strncmp(records.recordArray[0][i], column, strlen(column)) == 0) {
@@ -184,6 +213,8 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   int row = 0;
   int col = 0;
   for (int i = 0; i < records.rowSize; i++) {
+
+    // If the unique value does not match the one we're interested in, skip that row
     if (i != 0 && strncmp(records.recordArray[i][colIndex], uniqueValue, strlen(uniqueValue)) != 0) {
 //       printf("Row %d: %s\n", i, records.recordArray[i][6]);
       continue;
@@ -191,6 +222,8 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
     
     col = 0;
     for (int j = 0; j < records.colSize; j++) {
+
+      // Skip the column that our unique value is contained in
       if (j == colIndex) {
         continue;
       }

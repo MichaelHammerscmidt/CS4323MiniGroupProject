@@ -150,6 +150,14 @@ struct uniqueRecordStruct receiveDataViaPipe(char* myPipe) {
   return record;
 }
 
+/**
+ * @brief This takes in a char array and convert it to a string with each row and col merged using some delimiters
+ * 
+ * @param recordArray 
+ * @param row 
+ * @param col 
+ * @return char* 
+ */
 char* concatenate(char recordArray[705][7][300], int row, int col) {  
   char* masterString = (char*)malloc(MAX_RECORD_STRING * sizeof(char));
 
@@ -176,11 +184,19 @@ char* concatenate(char recordArray[705][7][300], int row, int col) {
 //       printf("The slave string is %s\n", slaveString);
     }
     strcat(masterString, slaveString);
+
+    // This replaces any new line with '@'
     masterString[ strcspn( masterString, "\n" ) ] = '@';
   }
   return masterString;
 }
 
+/**
+ * @brief This converts the delimited string to a 3D array which gets added to a struct
+ * 
+ * @param arrayString 
+ * @return struct uniqueRecordStruct 
+ */
 struct uniqueRecordStruct unwrap(char* arrayString) {
   
     char rowArray[700][300];

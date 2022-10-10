@@ -7,7 +7,7 @@
 #include "read_file.h"
 #include "unique_record_struct.h"
 #include "process_data_struct.h"
-// #include "ServerCombine.h"
+#include "server.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -25,56 +25,11 @@
 #include <fcntl.h>  //required for open (i.e. file control options)
 #define MAX_RECORD_STRING 80000
 
+
 struct msgQue{
     long int msgType;
     char msgText[50];
 };
-
-void displayOrSave(struct uniqueRecordStruct uniqueRecord, bool isDisplay);
-void display(struct uniqueRecordStruct uniqueRecord, int newSocket);
-void save(struct uniqueRecordStruct uniqueRecord);
-
-void displayOrSave(struct uniqueRecordStruct uniqueRecord, bool isDisplay) {
-  if (isDisplay) {
-//     display(uniqueRecord);
-  } else {
-    save(uniqueRecord);
-  }
-}
-
-void display(struct uniqueRecordStruct uniqueRecord, int newSocket) {
-  printf("------------------display function------------------");
-  for (int i = 1; i < uniqueRecord.rowSize; i++) {
-      for (int j = 0; j < uniqueRecord.colSize; j++) { 
-          printf("%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
-
-          send(newSocket, uniqueRecord.recordArray[i][j], strlen(uniqueRecord.recordArray[i][j]),0);
-          printf("%s\n\n", uniqueRecord.recordArray[i][j]);
-      }
-      printf("---------------------------------\n");
-  }
-}
-
-void save(struct uniqueRecordStruct uniqueRecord) {
-  char filename[50];
-  strcpy(filename, uniqueRecord.uniqueValue);
-  strcat(filename, ".txt");
-  
-  FILE *outFile = fopen(filename, "w");
-  if (outFile == NULL || !outFile) {
-    perror("There was an error opening the file for writing");
-    exit(EXIT_FAILURE);
-  }
-  
-  for (int i = 1; i < uniqueRecord.rowSize; i++) {
-      for (int j = 0; j < uniqueRecord.colSize; j++) {
-        fprintf(outFile, "%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
-        fprintf(outFile, "%s\n\n", uniqueRecord.recordArray[i][j]);
-      }
-      fprintf(outFile, "---------------------------------\n");
-  }
-  fclose(outFile);
-}
 
 int main(){
     //port used for connection between client and server
@@ -131,140 +86,188 @@ int main(){
             return 0;
         }
         printf("Connection made on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-      
-        // Main Menu goes here ----------------------------------------      
+
 
         //creates each of the child processes
         if((childProcessID = fork()) == 0){
             //closes the main port that clients use to connect in the child processes
             close(serverSocket);
           
-            
-        //variables to make the main menu work and store user input
-        char filename[36];
-        char column[36];
-        char uniqueValue[128];
-        bool mainMenu = true;
-        int currentRecievedMsg = 0;
-        int numberOfUniques = 0;
-        // bool isDisplaying = false;
+          
+            // Main Menu goes here ----------------------------------------
+      
+            // Declare variables to be determined by the user.
+            char filename[36];
+            char column[36];
+            char uniqueValue[128];
+            bool mainMenu = true;
+            int currentRecievedMsg = 0;
+            int numberOfUniques = 0;
+            struct uniqueRecordStruct uniqueRecordArray;
+            // bool isDisplaying = false;
+          
+          
+//             while(mainMenu) {
+//               //loop which handles telling the client what to input
+//                 bzero(buffer, sizeof(buffer));
+//             }
 
-        //while loop that 
-        while(mainMenu){
-            //loop which handles telling the client what to input
-            bzero(buffer,sizeof(buffer));
-            if(currentRecievedMsg == 1){
-                send(newSocket, "Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n", strlen("Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n"),0);
+
+            //while loop that 
+            while(mainMenu){
+                //loop which handles telling the client what to input
                 bzero(buffer,sizeof(buffer));
-            }else if(currentRecievedMsg == 2){
-                send(newSocket, "Choose an option 1.Book category or 2.Star rating or 3.Stock\n", strlen("Choose an option 1.Book category or 2.Star rating or 3.Stock\n"),0);
-                bzero(buffer,sizeof(buffer));
-            }else if(currentRecievedMsg == 3){
-                send(newSocket, "Choose an option 1.User rating or 2.Year or 3.Genre\n", strlen("Choose an option 1.User rating or 2.Year or 3.Genre\n"),0);
-                bzero(buffer,sizeof(buffer));
+                if(currentRecievedMsg == 1) {
+                    char* message = "\nChoose an option: \n1. bookInfo.txt \n2. amazonBestsellers.txt\n";
+                  
+                    send(newSocket, message, strlen(message), 0);
+                    bzero(buffer,sizeof(buffer));
+                  
+                } else if(currentRecievedMsg == 2){
+                    char* message = "\nChoose an option: \n1. Book category  \n2. Star rating  \n3. Stock\n";
+                  
+                    send(newSocket, message, strlen(message), 0);
+                    bzero(buffer, sizeof(buffer));
+                  
+                } else if(currentRecievedMsg == 3){
+                    char* message = "\nChoose an option: \n1. User rating  \n2. Year \n3. Genre\n";
+                    send(newSocket, message, strlen(message),0);
+                    bzero(buffer,sizeof(buffer));
+                }
+
+                //receives messages from the client 
+                recv(newSocket, buffer, 512, 0);
+                //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
+                if(strcmp(buffer, "exit") == 0){
+                    close(newSocket);
+                    printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
+                  
+                    return 0;
+                }
+              
+                if(strlen(buffer) > 0){
+                    //displays what the client has sent to the server
+                    printf("Client sent: %s\n", buffer);
+                }
+
+                //the first loop after random client input
+                if(currentRecievedMsg == 0) {
+                    currentRecievedMsg = 1;
+                    printf("currentRecievedMSG = 1\n");
+                  
+                //loop that handles choosing which files to get options from
+                } else if(currentRecievedMsg == 1){
+                    
+                  //sets the filename value to bookinfo.txt if the user input was 1
+                    if(strcmp(buffer, "1") == 0){
+                        strcpy(filename, "bookInfo.txt");
+                        currentRecievedMsg = 2;
+                        printf("Input was 1 and filename set to bookInfo.txt new currentRecievedMSG = 2\n");
+                      
+                    } else if(strcmp(buffer, "2") == 0){
+                      
+                        //sets the filename to amazonbestsellers.txt if the user input was 2
+                        strcpy(filename, "amazonBestsellers.txt");
+                        currentRecievedMsg = 3;
+                        printf("Input was 2 and filename set to amazonBestsellers.txt new currentRecievedMSG = 3\n");
+                    }
+                  
+                
+                } else if(currentRecievedMsg == 2) {
+                    //loop that handles the user options for bookinfo.txt
+                  
+                    // Read the file and save into the struct.
+                    if (uniqueRecordArray.rowSize == 0) {
+                      uniqueRecordArray = readFile("bookInfo.txt");
+                    }  
+                  
+                  
+                    //sets the column value to book category if the user input was 1
+                    if(strcmp(buffer, "1") == 0){
+                      
+                        int nUniques = 0;
+//                         char **uniqueArray = getUniqueValues(uniqueRecordArray, column, &nUniques);
+//                         char uniqueValuesHolder[11];
+//                         strcpy(uniqueValuesHolder, "1. ");
+//                         for (int i = 0; i < nUniques; i++) {
+//                           char* temp = (char*)malloc(sizeof(char));
+//                           sprintf(temp, "\n%d. ", i;
+                          
+//                           strcat(uniqueValuesHolder, "\n2. ")
+//                         }
+                      
+                        strcpy(column, "Book category");
+                        printf("Input was 1 and column set to book category new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "Philosophy");
+                        mainMenu = false;
+                    //sets the column value to star rating if the user input was 2
+                    }else if(strcmp(buffer, "2") == 0){
+                        strcpy(column,"Star rating");
+                        printf("Input was 2 and column set to star rating new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "Three");
+                        mainMenu = false;
+                    //sets the column value to stock if the user input was 3
+                    }else if(strcmp(buffer, "3") == 0){
+                        strcpy(column, "Stock");
+                        printf("Input was 3 and column set to stock new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "In stock");
+                        mainMenu = false;
+                    }
+                //loop that handles the user options for amazonbestsellers.txt
+                }else if(currentRecievedMsg == 3){
+                    //sets the column value to user rating if the user input was 1
+                  
+                    // Read the file and save into the struct.
+                    if (uniqueRecordArray.rowSize == 0) {
+                      uniqueRecordArray = readFile("amazonBestsellers.txt");
+                    }  
+                  
+                    if(strcmp(buffer, "1") == 0){
+                        strcpy(column, "User rating");
+                        printf("Input was 1 and column set to user rating new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "7");
+                        mainMenu = false;
+                    //sets the column value to year if the user input was 2
+                    }else if(strcmp(buffer, "2") == 0){
+                        strcpy(column, "Year");                 
+                        printf("Input was 2 and column set to year new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "2011");
+                        mainMenu = false;
+                    //sets the column value to genre if the user input was 3
+                    }else if(strcmp(buffer, "3") == 0){
+                        strcpy(column, "Genre");
+                        printf("Input was 3 and column set to genre new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        strcpy(uniqueValue, "Fiction");
+                        mainMenu = false;
+                    }
+                }
             }
 
-            //receives messages from the client 
-            recv(newSocket, buffer, 512, 0);
-            //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
-            if(strcmp(buffer, "exit") == 0){
-                close(newSocket);
-                printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-                return 0;    
-            }else if(strlen(buffer) > 0){
-                //displays what the client has sent to the server
-                printf("Client sent: %s\n", buffer);
-            }
+    //         strcpy(filename, "amazonBestsellers.txt");
+    //         strcpy(column, "Genre");
+    //         strcpy(uniqueValue, "Fiction");
 
-            //the first loop after random client input
-            if(currentRecievedMsg == 0){
-                currentRecievedMsg = 1;
-                printf("currentRecievedMSG = 1\n");
-            //loop that handles choosing which files to get options from
-            }else if(currentRecievedMsg == 1){
-                //sets the filename value to bookinfo.txt if the user input was 1
-                if(strcmp(buffer, "1") == 0){
-                    strcpy(filename,"bookInfo.txt");
-                    currentRecievedMsg = 2;
-                    printf("Input was 1 and filename set to bookInfo.txt new currentRecievedMSG = 2\n");
-                //sets the filename to amazonbestsellers.txt if the user input was 2
-                }else if(strcmp(buffer, "2") == 0){
-                    strcpy(filename,"amazonBestsellers.txt");
-                    currentRecievedMsg = 3;
-                    printf("Input was 2 and filename set to amazonBestsellers.txt new currentRecievedMSG = 3\n");
-                }
-            //loop that handles the user options for bookinfo.txt
-            }else if(currentRecievedMsg == 2){
-                //sets the column value to book category if the user input was 1
-                if(strcmp(buffer, "1") == 0){
-                    strcpy(column,"Book category\n");
-                    printf("Input was 1 and column set to book category new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "Philosophy");
-                    mainMenu = false;
-                //sets the column value to star rating if the user input was 2
-                }else if(strcmp(buffer, "2") == 0){
-                    strcpy(column,"Star rating\n");
-                    printf("Input was 2 and column set to star rating new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "Three");
-                    mainMenu = false;
-                //sets the column value to stock if the user input was 3
-                }else if(strcmp(buffer, "3") == 0){
-                    strcpy(column,"Stock\n");
-                    printf("Input was 3 and column set to stock new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "In stock");
-                    mainMenu = false;
-                }
-            //loop that handles the user options for amazonbestsellers.txt
-            }else if(currentRecievedMsg == 3){
-                //sets the column value to user rating if the user input was 1
-                if(strcmp(buffer, "1") == 0){
-                    strcpy(column,"User rating\n");
-                    printf("Input was 1 and column set to user rating new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "7");
-                    mainMenu = false;
-                //sets the column value to year if the user input was 2
-                }else if(strcmp(buffer, "2") == 0){
-                    strcpy(column,"Year\n");                 
-                    printf("Input was 2 and column set to year new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "2011");
-                    mainMenu = false;
-                //sets the column value to genre if the user input was 3
-                }else if(strcmp(buffer, "3") == 0){
-                    strcpy(column,"Genre\n");
-                    printf("Input was 3 and column set to genre new currentRecievedMSG = 4\n");
-                    printf("Main menu completed\n");
-                    strcpy(uniqueValue, "Fiction");
-                    mainMenu = false;
-                }
-            }
-        }
+            printf("%s\n", filename);
+            printf("%s\n", column);
+            printf("%s\n", uniqueValue);
+            bzero(buffer, sizeof(buffer));
+            send(newSocket, "Main Menu Input Completed\n", strlen("Main Menu Input Completed\n"), 0);
+            bzero(buffer, sizeof(buffer));
 
-        //prints the users input and sends the client confirmation that the main menu is completed 
-        printf("%s\n", filename);
-        printf("%s\n", column);
-        printf("%s\n", uniqueValue);
-        bzero(buffer,sizeof(buffer));
-        send(newSocket, "Main Menu Input Completed\n", strlen("Main Menu Input Completed\n"), 0);
-        bzero(buffer,sizeof(buffer));
+//             // Read the file and save into the struct.
+//             struct uniqueRecordStruct uniqueRecordArray = readFile(filename);
 
-        
-        // Read the file and save into the struct.
-        struct uniqueRecordStruct uniqueRecordArray = readFile(filename);
-      
-      
-        //Define struct to save unique values into
-        struct uniqueRecordStruct uniqueValueRecord;
-      
-        // TODO:  save the unique values ------------------------------
-        char **uniqueArray = getUniqueValues(uniqueRecordArray, column, &numberOfUniques);
+            // TODO:  save the unique values ------------------------------
+            char **uniqueArray = getUniqueValues(uniqueRecordArray, column, &numberOfUniques);
 
             //values that we use for the message que
-            int numOfProcesses = numberOfUniques;
+            int numOfProcesses = 2;
             int currentProcess = 0;
             int msgID;
             int running = 1;
@@ -293,8 +296,8 @@ int main(){
                     send(newSocket, buffer, strlen(buffer), 0);
                   }
                   countOfMessages++;
-                    //resets the buffer to all null values
-                    bzero(buffer,sizeof(buffer));
+                  //resets the buffer to all null values
+                  bzero(buffer,sizeof(buffer));
                 }
 
                 //loop to create the number of child processes we need to
@@ -379,18 +382,15 @@ int main(){
 
                           struct uniqueRecordStruct uniqueRecord = unwrap(recordString);
                           strcpy(uniqueRecord.uniqueValue, uniqueArray[count]);
-                          printf("The received message is: %s\n", uniqueRecord.recordArray[12][1]);
-                          
-                          printf("------------------before display function------------------");
+//                           printf("The received message is: %s\n", uniqueRecord.recordArray[12][1]);
                           
                           if (strncmp(uniqueArray[count], uniqueValue, strlen(uniqueValue)) == 0) {
-                            printf("------------------display function------------------");
                             // Either display or save
-                            display(uniqueRecord, newSocket);
-                            save(uniqueRecord);
+//                             displayOrSave(uniqueRecord, true);
+                              display(uniqueRecord, newSocket);
+                              save(uniqueRecord);
                           }
 
-                          printf("------------------after display function------------------");
 
                           close(fd[0]);
 
@@ -412,3 +412,64 @@ int main(){
     }
     return 0;
 }
+
+void displayOrSave(struct uniqueRecordStruct uniqueRecord, bool isDisplay) {
+//   if (isDisplay) {
+//     display(uniqueRecord);
+//   } else {
+//     save(uniqueRecord);
+//   }
+  
+//   display(uniqueRecord);
+//   save(uniqueRecord);
+}
+
+void display(struct uniqueRecordStruct uniqueRecord, int newSocket) {
+  for (int i = 1; i < uniqueRecord.rowSize; i++) {
+      for (int j = 0; j < uniqueRecord.colSize; j++) { 
+//           recv(newSocket, "Next record", strlen("Next record"), 0);
+        
+          char* temp = (char*)malloc(sizeof(char));
+          sprintf(temp, "%d. ", (j + 1));
+        
+          char message1[100];
+          strcpy(message1, uniqueRecord.recordArray[0][j]);
+        
+          strcat(temp, message1);
+          strcat(temp, "\n");
+
+          send(newSocket, temp, strlen(temp), 0);
+
+          char message2[100];
+          strcpy(message2, uniqueRecord.recordArray[i][j]);
+          strcat(message2, "\n\n");
+        
+          send(newSocket, message2, strlen(message2), 0);
+
+      }
+      char* dottedLine = "---------------------------------\n";
+      send(newSocket, dottedLine, strlen(dottedLine), 0);
+  }
+}
+
+void save(struct uniqueRecordStruct uniqueRecord) {
+  char filename[50];
+  strcpy(filename, uniqueRecord.uniqueValue);
+  strcat(filename, ".txt");
+  
+  FILE *outFile = fopen(filename, "w");
+  if (outFile == NULL || !outFile) {
+    perror("There was an error opening the file for writing");
+    exit(EXIT_FAILURE);
+  }
+  
+  for (int i = 1; i < uniqueRecord.rowSize; i++) {
+      for (int j = 0; j < uniqueRecord.colSize; j++) {
+        fprintf(outFile, "%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
+        fprintf(outFile, "%s\n\n", uniqueRecord.recordArray[i][j]);
+      }
+      fprintf(outFile, "---------------------------------\n");
+  }
+  fclose(outFile);
+}
+
