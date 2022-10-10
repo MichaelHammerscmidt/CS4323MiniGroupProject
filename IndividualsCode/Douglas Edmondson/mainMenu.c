@@ -8,6 +8,10 @@
 
 //DOES NOT COMPILE
 
+        // Create struct to save options.txt file into
+        // DataTable optionsTable;
+        // readFile("options.txt", &optionsTable);
+
         // Sends Main menu to client
         send(newSocket, "Enter a selection: \n", strlen("Enter a selection: \n"), 0);
         send(newSocket, "1. bookInfo.txt  \n", strlen("1. bookInfo.txt  \n"), 0);
@@ -58,12 +62,9 @@
                         while (1)
                         {
                             send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
-                            send(newSocket, "1. Title  \n", strlen("1.Title  \n"), 0);
-                            send(newSocket, "2. Book Category\n", strlen("2. Book Category\n"), 0);
-                            send(newSocket, "3. Star Rating \n", strlen("3. Star Rating \n"), 0);
-                            send(newSocket, "4. Price \n", strlen("4. Price \n"), 0);
-                            send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
-                            send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
+                            send(newSocket, "1. Book Category  \n", strlen("1.Book Category  \n"), 0);
+                            send(newSocket, "2. Star Rating\n", strlen("2. Star Rating\n"), 0);
+                            send(newSocket, "3. Stock\n", strlen("3. Stock \n"), 0);
 
                             // resets the buffer to all null values
                             bzero(buffer, sizeof(buffer));
@@ -74,42 +75,21 @@
                             {
                                 if(strcmp(buffer, "1")==0)
                                 {
-                                    strcpy(column, "Title");
+                                    strcpy(column, "Book Category");
                                     // display()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "2")==0)
                                 {
-                                    strcpy(column, "Book Category");
+                                    strcpy(column, "Star Rating");
                                     // display()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "3")==0)
                                 {
-                                    strcpy(column, "Star Rating");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "4")==0)
-                                {
-                                    strcpy(column, "Price");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "5")==0)
-                                {
                                     strcpy(column, "Stock");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "6")==0)
-                                {
-                                    strcpy(column, "Quantity");
                                     // display()
                                     break;
                                 }
@@ -126,12 +106,9 @@
                         while (1)
                         {
                             send(newSocket, "Which record to save: \n", strlen("Which record to save: \n"), 0);
-                            send(newSocket, "1.Title  \n", strlen("1.Title  \n"), 0);
-                            send(newSocket, "2. Book Category\n", strlen("2. Book Category\n"), 0);
-                            send(newSocket, "3. Star rating \n", strlen("3. Star Rating \n"), 0);
-                            send(newSocket, "4. Price \n", strlen("4. Price \n"), 0);
-                            send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
-                            send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
+                            send(newSocket, "1. Book Category  \n", strlen("1.Book Category  \n"), 0);
+                            send(newSocket, "2. Star Rating\n", strlen("2. Star Rating\n"), 0);
+                            send(newSocket, "3. Stock\n", strlen("3. Stock \n"), 0);
 
                             // resets the buffer to all null values
                             bzero(buffer, sizeof(buffer));
@@ -142,43 +119,22 @@
                             {
                                 if(strcmp(buffer, "1")==0)
                                 {
-                                    strcpy(column, "Title");
-                                    // saveFile()
+                                    strcpy(column, "Book Category");
+                                    // save()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "2")==0)
                                 {
-                                    strcpy(column, "Book Category");
-                                    // saveFile()
+                                    strcpy(column, "Star Rating");
+                                    // save()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "3")==0)
                                 {
-                                    strcpy(column, "Star Rating");
-                                    // SaveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "4")==0)
-                                {
-                                    strcpy(column, "Price");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "5")==0)
-                                {
                                     strcpy(column, "Stock");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "6")==0)
-                                {
-                                    strcpy(column, "Quantity");
-                                    // saveFile()
+                                    // save()
                                     break;
                                 }
                             }
@@ -220,13 +176,9 @@
                         while (1)
                         {
                             send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
-                            send(newSocket, "1. Name \n", strlen("1. Name \n"), 0);
-                            send(newSocket, "2. Author \n", strlen("2. Author \n"), 0);
-                            send(newSocket, "3. User rating \n", strlen("3. User Rating \n"), 0);
-                            send(newSocket, "4. Reviews \n", strlen("4. Reviews \n"), 0);
-                            send(newSocket, "5. Price \n", strlen("5. Price \n"), 0);
-                            send(newSocket, "6. Year \n", strlen("6. Year \n"), 0);
-                            send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
+                            send(newSocket, "1. User Rating \n", strlen("1. User Rating \n"), 0);
+                            send(newSocket, "2. Year \n", strlen("2. Year \n"), 0);
+                            send(newSocket, "3. Genre \n", strlen("3. Genre \n"), 0);
 
                             // resets the buffer to all null values
                             bzero(buffer, sizeof(buffer));
@@ -237,46 +189,19 @@
                             {
                                 if(strcmp(buffer, "1")==0)
                                 {
-                                    strcpy(column, "Name");
+                                    strcpy(column, "User Rating");
                                     // display()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "2")==0)
                                 {
-                                    strcpy(column, "Author");
+                                    strcpy(column, "Year");
                                     // display()
                                     break;
                                 }
 
                                 else if(strcmp(buffer, "3")==0)
-                                {
-                                    strcpy(column, "User Rating");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "4")==0)
-                                {
-                                    strcpy(column, "Reviews");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "5")==0)
-                                {
-                                    strcpy(column, "Price");
-                                    // display()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "6")==0)
-                                {
-                                    strcpy(column, "Year");
-                                    // display()
-                                    break;
-                                }
-                                else if(strcmp(buffer, "7")==0)
                                 {
                                     strcpy(column, "Genre");
                                     // display()
@@ -293,14 +218,10 @@
                     {
                         while (1)
                         {
-                            send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
+                            send(newSocket, "Which record to save: \n", strlen("Which record to display: \n"), 0);
                             send(newSocket, "1. Name \n", strlen("1. Name \n"), 0);
                             send(newSocket, "2. Author \n", strlen("2. Author \n"), 0);
                             send(newSocket, "3. User Rating \n", strlen("3. User Rating \n"), 0);
-                            send(newSocket, "4. Reviews \n", strlen("4. Reviews \n"), 0);
-                            send(newSocket, "5. Price \n", strlen("5. Price \n"), 0);
-                            send(newSocket, "6. Year\n", strlen("6. Year \n"), 0);
-                            send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
 
                             // resets the buffer to all null values
                             bzero(buffer, sizeof(buffer));
@@ -309,51 +230,24 @@
 
                             if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses option
                             {
-                                if(strcmp(buffer, "1")
-                                {
-                                    strcpy(column, "Name");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "2")
-                                {
-                                    strcpy(column, "Author");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "3")
+                                if(strcmp(buffer, "1")==0)
                                 {
                                     strcpy(column, "User Rating");
-                                    // SaveFile()
+                                    // save()
                                     break;
                                 }
 
-                                else if(strcmp(buffer, "4")
-                                {
-                                    strcpy(column, "Reviews");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "5")
-                                {
-                                    strcpy(column, "Price");
-                                    // saveFile()
-                                    break;
-                                }
-
-                                else if(strcmp(buffer, "6")
+                                else if(strcmp(buffer, "2")==0)
                                 {
                                     strcpy(column, "Year");
-                                    // saveFile()
+                                    // save()
                                     break;
                                 }
-                                else if(strcmp(buffer, "7")
+
+                                else if(strcmp(buffer, "3")==0)
                                 {
                                     strcpy(column, "Genre");
-                                    // saveFile()
+                                    // save()
                                     break;
                                 }
                             }
@@ -386,5 +280,3 @@
             bzero(buffer, sizeof(buffer));
         }
     }
-    return 0;
-}
