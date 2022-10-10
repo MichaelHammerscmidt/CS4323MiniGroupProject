@@ -85,7 +85,7 @@ int main(){
             bool mainMenu = true;
             int currentRecievedMsg = 0;
 
-            /*
+            
 
             while(mainMenu){
                 bzero(buffer,sizeof(buffer));
@@ -108,6 +108,7 @@ int main(){
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
                     return 0;    
                 }else if(strlen(buffer) > 0){
+                    //displays what the client has sent to the server
                     printf("Client sent: %s\n", buffer);
                 }
                 
@@ -161,10 +162,11 @@ int main(){
                 }
             }
 
-            */
-
-            //printf("%s\n", filename);
-            //printf("%s\n", column);
+            printf("%s\n", filename);
+            printf("%s\n", column);
+            bzero(buffer,sizeof(buffer));
+            send(newSocket, "Main Menu Input Completed\n", strlen("Main Menu Input Completed\n"), 0);
+            bzero(buffer,sizeof(buffer));
 
             //values that we use for the message que
             int numOfProcesses = 3;
