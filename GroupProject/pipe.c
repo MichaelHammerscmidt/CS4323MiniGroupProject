@@ -1,5 +1,6 @@
-// #include "read_file.c"
 #include "unique_record_struct.h"
+#include "process_data_struct.h"
+#include <stdlib.h>
 #include "pipe.h"
 #include <stdio.h>  // Baisc standard I/O like printf
 #include <unistd.h>  // defines standard symbolic constants and types
@@ -17,26 +18,30 @@
 
 char myPipe[] = "./NamedPipe";  // FIFO file path 
 
+//extern struct uniqueRecordStruct uniqueRecordArray;
+
 // int main() {
     
-// //     int pid = fork();
-// //     if (pid < 0) {
-// //         printf("There was an error creating the process\n");
-// //         return 0;
-// //     }
-
-// //     if (pid == 0) {
-// //         sendDataViaPipe(myPipe);
-// //     } else {
-// //         receiveDataViaPipe(myPipe);
-// //     }
+//     int pid = fork();
+//     if (pid < 0) {
+//         printf("There was an error creating the process\n");
+//         return 0;
+//     }
+  
   
 //     struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
 
 //     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
 
+    
+//     if (pid == 0) {
+//         sendDataViaPipe(myPipe, uniqueRecord);
+//     } else {
+//         receiveDataViaPipe(myPipe);
+//     }
+  
 //     char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-// //     printf("The array:%sC\n", recordString);
+//     printf("The array:%sC\n", recordString);
   
 //     struct uniqueRecordStruct newRecord = unwrap(recordString);
 
