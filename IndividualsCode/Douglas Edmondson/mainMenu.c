@@ -8,227 +8,383 @@
 
 //DOES NOT COMPILE
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <readFile.h>
-#include <display.h>
-#include <saveFile.h>
+        // Sends Main menu to client
+        send(newSocket, "Enter a selection: \n", strlen("Enter a selection: \n"), 0);
+        send(newSocket, "1. bookInfo.txt  \n", strlen("1. bookInfo.txt  \n"), 0);
+        send(newSocket, "2. amazonBestsellers.txt  \n", strlen("2. amazonBestsellers.txt  \n"), 0);
+        send(newSocket, "or type exit  \n", strlen("or type exit  \n"), 0);
 
-int main(char** fileFromReadFile)
-{
-    if(strcmp("bookInfo.txt",fileFromReadFile) != 0)
-    {
-        int choice;
-        int midChoice;
-        while (choice!=4)   //while choice isn't exit, program runs
+        // receives messages from the client
+        recv(newSocket, buffer, 512, 0);
+        // checks to make sure the client has not exited and if it has breaks out of the loop that controls child processes
+        if (strncmp("exit", buffer, strlen("exit")) == 0)
         {
-            printf("Enter a selection: \n");
-            printf("1.Display Records  \n");
-            printf("2.Save Records \n");
-            printf("3.Display Summary \n");
-            printf("4. Exit \n");
-            scanf("%i", &choice); //saves choice made from user 
+            printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
+            // temporary return point for the child process to break the loop with the current connected client
+            // dont think this is the correct way to kill the child process
+            goto ReturnToHere;
+        }
+        else
+        {
+            // displays what the client has sent to the server
+            printf("Client sent: %s\n", buffer); // sends the message back to the client
 
-            if(choice==1)   //if user chooses to display records
+            // Declare variables to be determined by the user.
+            char filename[36];
+            char column[36];
+            char uniqueValue[128];
+            int numberOfUniques;
+
+            send(newSocket, buffer, strlen(buffer), 0);
+            if (strncmp("1", buffer, strlen("1")) == 0)
             {
-                printf("Which record to display: \n");
-                printf("1. Title  \n");
-                printf("2. Book Category\n");
-                printf("3. Star Rating \n");
-                printf("4. Price\n");
-                printf("5. Stock\n");
-                printf("6. Quantity\n");
-                scanf("%i", &midChoice); //saves choice made from user
+                send(newSocket, "You selected bookInfo.txt \n", strlen("You selected bookInfo.txt \n"), 0);
+                strcpy(filename, "bookInfo.txt"); // Assign the correct filename
 
-                if(midChoice==1)   //if user chooses option 1
+                while (strncmp("4", buffer, strlen("4")) != 0) // while exit isn't selected, program runs
                 {
-                    //display(title)
-                } 
+                    send(newSocket, "Enter a selection: \n", strlen("Enter a selection: \n"), 0);
+                    send(newSocket, "1.Display Records  \n", strlen("1.Display Records  \n"), 0);
+                    send(newSocket, "2.Save Records \n", strlen("2.Save Records \n"), 0);
+                    send(newSocket, "3.Display Summary \n", strlen("3.Display Summary \n"), 0);
+                    send(newSocket, "4. Exit \n", strlen("4. Exit \n"), 0);
 
-                if(midChoice==2)   //if user chooses option 2
-                {
-                    //display(book category)
-                } 
+                    // resets the buffer to all null values
+                    bzero(buffer, sizeof(buffer));
+                    recv(newSocket, buffer, 512, 0); // saves choice made from user
 
-                if(midChoice==3)   //if user chooses option 3
-                {
-                    //display(star rating)
-                } 
-                if(midChoice==4)   //if user chooses option 4
-                {
-                    //display(price)
-                } 
+                    if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses to display records
+                    {
+                        while (1)
+                        {
+                            send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
+                            send(newSocket, "1. Title  \n", strlen("1.Title  \n"), 0);
+                            send(newSocket, "2. Book Category\n", strlen("2. Book Category\n"), 0);
+                            send(newSocket, "3. Star Rating \n", strlen("3. Star Rating \n"), 0);
+                            send(newSocket, "4. Price \n", strlen("4. Price \n"), 0);
+                            send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
+                            send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
 
-                if(midChoice==5)   //if user chooses option 5
-                {
-                    //display(stock)
-                } 
+                            // resets the buffer to all null values
+                            bzero(buffer, sizeof(buffer));
+                            //  receives messages from the client
+                            recv(newSocket, buffer, 512, 0);
 
-                if(midChoice==6)   //if user chooses option 6
+                            if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses option
+                            {
+                                if(strcmp(buffer, "1")==0)
+                                {
+                                    strcpy(column, "Title");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "2")==0)
+                                {
+                                    strcpy(column, "Book Category");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "3")==0)
+                                {
+                                    strcpy(column, "Star Rating");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "4")==0)
+                                {
+                                    strcpy(column, "Price");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "5")==0)
+                                {
+                                    strcpy(column, "Stock");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "6")==0)
+                                {
+                                    strcpy(column, "Quantity");
+                                    // display()
+                                    break;
+                                }
+                            }
+
+                            else
+                            {
+                                send(newSocket, "Invalid input \n", strlen("Invalid input \n"), 0);
+                            }
+                        }
+                    }
+                    else if (strncmp("2", buffer, strlen("2")) == 0) // if user chooses to save records
+                    {
+                        while (1)
+                        {
+                            send(newSocket, "Which record to save: \n", strlen("Which record to save: \n"), 0);
+                            send(newSocket, "1.Title  \n", strlen("1.Title  \n"), 0);
+                            send(newSocket, "2. Book Category\n", strlen("2. Book Category\n"), 0);
+                            send(newSocket, "3. Star rating \n", strlen("3. Star Rating \n"), 0);
+                            send(newSocket, "4. Price \n", strlen("4. Price \n"), 0);
+                            send(newSocket, "5. Stock \n", strlen("5. Stock \n"), 0);
+                            send(newSocket, "6. Quantity \n", strlen("6. Quantity \n"), 0);
+
+                            // resets the buffer to all null values
+                            bzero(buffer, sizeof(buffer));
+                            // saves choice made from user
+                            recv(newSocket, buffer, 512, 0);
+
+                            if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses option
+                            {
+                                if(strcmp(buffer, "1")==0)
+                                {
+                                    strcpy(column, "Title");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "2")==0)
+                                {
+                                    strcpy(column, "Book Category");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "3")==0)
+                                {
+                                    strcpy(column, "Star Rating");
+                                    // SaveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "4")==0)
+                                {
+                                    strcpy(column, "Price");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "5")==0)
+                                {
+                                    strcpy(column, "Stock");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "6")==0)
+                                {
+                                    strcpy(column, "Quantity");
+                                    // saveFile()
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                send(newSocket, "Invalid input \n", strlen("Invalid input \n"), 0);
+                            }
+                        }
+                    }
+                    else if (strncmp("3", buffer, strlen("3")) == 0) // if user chooses to display summary
+                    {
+                        // displaySummary function
+                    }
+                    else
+                    {
+                        send(newSocket, "Invalid input \n", strlen("Invalid input \n"), 0);
+                    }
+                }
+            }
+            else if (strncmp("2", buffer, strlen("2")) == 0)
+            {
+
+                send(newSocket, "You selected amazonBestsellers.txt  \n", strlen("You selected amazonBestsellers.txt  \n"), 0);
+                strcpy(filename, "amazonBestsellers.txt"); // Assign the filename to filename variable
+
+                while (strncmp("4", buffer, strlen("4")) != 0) // while exist isn't selected, program runs
                 {
-                    //display(quantity)
-                } 
+                    send(newSocket, "Enter a selection: \n", strlen("Enter a selection: \n"), 0);
+                    send(newSocket, "1.Display Records  \n", strlen("1.Display Records  \n"), 0);
+                    send(newSocket, "2.Save Records \n", strlen("2.Save Records \n"), 0);
+                    send(newSocket, "3.Display Summary \n", strlen("3.Display Summary \n"), 0);
+                    send(newSocket, "4. Exit \n", strlen("4. Exit \n"), 0);
+
+                    // scanf("%i", &choice);
+                    recv(newSocket, buffer, 512, 0); // saves choice made from user
+
+                    if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses to display records
+                    {
+                        while (1)
+                        {
+                            send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
+                            send(newSocket, "1. Name \n", strlen("1. Name \n"), 0);
+                            send(newSocket, "2. Author \n", strlen("2. Author \n"), 0);
+                            send(newSocket, "3. User rating \n", strlen("3. User Rating \n"), 0);
+                            send(newSocket, "4. Reviews \n", strlen("4. Reviews \n"), 0);
+                            send(newSocket, "5. Price \n", strlen("5. Price \n"), 0);
+                            send(newSocket, "6. Year \n", strlen("6. Year \n"), 0);
+                            send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
+
+                            // resets the buffer to all null values
+                            bzero(buffer, sizeof(buffer));
+                            // scanf("%i", &midChoice);
+                            recv(newSocket, buffer, 512, 0); // saves choice made from user
+
+                            if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses option
+                            {
+                                if(strcmp(buffer, "1")==0)
+                                {
+                                    strcpy(column, "Name");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "2")==0)
+                                {
+                                    strcpy(column, "Author");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "3")==0)
+                                {
+                                    strcpy(column, "User Rating");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "4")==0)
+                                {
+                                    strcpy(column, "Reviews");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "5")==0)
+                                {
+                                    strcpy(column, "Price");
+                                    // display()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "6")==0)
+                                {
+                                    strcpy(column, "Year");
+                                    // display()
+                                    break;
+                                }
+                                else if(strcmp(buffer, "7")==0)
+                                {
+                                    strcpy(column, "Genre");
+                                    // display()
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                send(newSocket, "Invalid input \n", strlen("Invalid input \n"), 0);
+                            }
+                        }
+                    }
+                    else if (strncmp("2", buffer, strlen("2")) == 0) // if user chooses to save records
+                    {
+                        while (1)
+                        {
+                            send(newSocket, "Which record to display: \n", strlen("Which record to display: \n"), 0);
+                            send(newSocket, "1. Name \n", strlen("1. Name \n"), 0);
+                            send(newSocket, "2. Author \n", strlen("2. Author \n"), 0);
+                            send(newSocket, "3. User Rating \n", strlen("3. User Rating \n"), 0);
+                            send(newSocket, "4. Reviews \n", strlen("4. Reviews \n"), 0);
+                            send(newSocket, "5. Price \n", strlen("5. Price \n"), 0);
+                            send(newSocket, "6. Year\n", strlen("6. Year \n"), 0);
+                            send(newSocket, "7. Genre \n", strlen("7. Genre \n"), 0);
+
+                            // resets the buffer to all null values
+                            bzero(buffer, sizeof(buffer));
+                            // scanf("%i", &midChoice);
+                            recv(newSocket, buffer, 512, 0); // saves choice made from user
+
+                            if (strncmp("1", buffer, strlen("1")) == 0) // if user chooses option
+                            {
+                                if(strcmp(buffer, "1")
+                                {
+                                    strcpy(column, "Name");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "2")
+                                {
+                                    strcpy(column, "Author");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "3")
+                                {
+                                    strcpy(column, "User Rating");
+                                    // SaveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "4")
+                                {
+                                    strcpy(column, "Reviews");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "5")
+                                {
+                                    strcpy(column, "Price");
+                                    // saveFile()
+                                    break;
+                                }
+
+                                else if(strcmp(buffer, "6")
+                                {
+                                    strcpy(column, "Year");
+                                    // saveFile()
+                                    break;
+                                }
+                                else if(strcmp(buffer, "7")
+                                {
+                                    strcpy(column, "Genre");
+                                    // saveFile()
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                send(newSocket, "Invalid input \n", strlen("Invalid input \n"), 0);
+                            }
+                        }
+                    }
+
+                    else if (strncmp("3", buffer, strlen("3")) == 0) // if user chooses to display summary
+                    {
+                        // displaySummary(args)
+                    }
+                    else
+                    {
+                        send(newSocket, "Not valid input  \n", strlen("Not valid input  \n"), 0);
+                    }
+                }
+            }
+            else
+            {
+                send(newSocket, "Not valid input  \n", strlen("Not valid input  \n"), 0);
             }
 
-            if(choice==2)   //if user chooses to save records
-            {
-                printf("Which record to save: \n");
-                printf("1. Title  \n");
-                printf("2. Book Category\n");
-                printf("3. Star Rating \n");
-                printf("4. Price\n");
-                printf("5. Stock\n");
-                printf("6. Quantity\n");//saves choice made from user 
+            // TODO: impliment Cody's message passing and call Christian's readFileByUniqueValue
+            // function passing in the variables: (char *filename, char *column, char *uniqueValue)
 
-                if(midChoice==1)   //if user chooses option
-                {
-                    //saveFile(title)
-                } 
-
-                if(midChoice==2)   //if user chooses option
-                {
-                    //saveFile(book category)
-                } 
-
-                if(midChoice==3)   //if user chooses option
-                {
-                    //saveFile(star rating)
-                } 
-                if(midChoice==4)   //if user chooses option
-                {
-                    //saveFile(price)
-                } 
-
-                if(midChoice==5)   //if user chooses option
-                {
-                    //saveFile(stock)
-                } 
-
-                if(midChoice==6)   //if user chooses option
-                {
-                    //saveFile(quantity)
-                } 
-
-            }
-
-            if(choice==3)   //if user chooses to display summary
-            {
-            //displaySummary function
-            }
+            // resets the buffer to all null values
+            bzero(buffer, sizeof(buffer));
         }
     }
-
-    else
-    {
-        int choice;
-        int midChoice;
-        while (choice!=4)   //while choice isn't exit, program runs
-        {
-            printf("Enter a selection: \n");
-            printf("1.Display Records  \n");
-            printf("2.Save Records \n");
-            printf("3.Display Summary \n");
-            printf("4. Exit \n");
-            scanf("%i", &choice); //saves choice made from user 
-
-            if(choice==1)   //if user chooses to display records
-            {
-                printf("Which record to display: \n");
-                printf("1. Name  \n");
-                printf("2. Author\n");
-                printf("3. User Rating \n");
-                printf("4. Reviews\n");
-                printf("5. Price\n");
-                printf("6. Year\n");
-                printf("7. Genre\n");
-                scanf("%i", &midChoice); //saves choice made from user
-
-                if(midChoice==1)   //if user chooses option
-                {
-                    //display(name)
-                } 
-
-                if(midChoice==2)   //if user chooses option
-                {
-                    //display(author)
-                } 
-
-                if(midChoice==3)   //if user chooses option
-                {
-                    //display(user rating)
-                } 
-                if(midChoice==4)   //if user chooses option
-                {
-                    //display(reviews)
-                } 
-
-                if(midChoice==5)   //if user chooses option
-                {
-                    //display(price)
-                } 
-
-                if(midChoice==6)   //if user chooses option
-                {
-                    //display(year)
-                } 
-                if(midChoice==7)   //if user chooses option
-                {
-                    //display(genre)
-                } 
-            }
-
-            if(choice==2)   //if user chooses to save records
-            {
-                printf("Which record to save: \n");
-                printf("1. Name  \n");
-                printf("2. Author\n");
-                printf("3. User Rating \n");
-                printf("4. Reviews\n");
-                printf("5. Price\n");
-                printf("6. Year\n");
-                printf("7. Genre\n");
-                scanf("%i", &midChoice); //saves choice made from user 
-
-                if(midChoice==1)   //if user chooses option
-                {
-                    //saveFile(name)
-                } 
-
-                if(midChoice==2)   //if user chooses option
-                {
-                    //saveFile(author)
-                } 
-
-                if(midChoice==3)   //if user chooses option
-                {
-                    //saveFile(user rating)
-                } 
-                if(midChoice==4)   //if user chooses option
-                {
-                    //saveFile(reviews)
-                } 
-
-                if(midChoice==5)   //if user chooses option
-                {
-                    //saveFile(price)
-                } 
-
-                if(midChoice==6)   //if user chooses option
-                {
-                    //saveFile(year)
-                } 
-                if(midChoice==7)   //if user chooses option
-                {
-                    //saveFile(genre)
-                } 
-
-            }
-
-            if(choice==3)   //if user chooses to display summary
-            {
-                //displaySummary(args)
-            }
-        }
-    }   
+    return 0;
 }
