@@ -19,10 +19,23 @@ struct msgQue{
     char msgText[MAX_TEXT];
 };
 
+struct uniqueRecordStruct uniqueRecord;
+
+struct uniqueRecordStruct uniqueRecords[5];
+
 int main(){
   
     char* column = "Stock";
     manageIPC("bookInfo.txt", column);
+  
+    wait(NULL);
+//     struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
+//     for (int i = 0; i < uniqueRecord_.rowSize; i++) {
+//       for (int j = 0; j < uniqueRecord_.colSize; j++) {
+//         printf("Col: %s ", uniqueRecord_.recordArray[i][j]);
+//       }
+//       printf("\n");
+//     }
     
     return 0;
 }
@@ -51,6 +64,9 @@ void manageIPC(char* filename, char* column) {
       if(msgID == -1){
           printf("Error making message queue\n");
       }
+    
+      int fd[2];
+      pipe(fd);
 
       t = fork();
       printf("Fork value: %d\n",t);
@@ -59,66 +75,112 @@ void manageIPC(char* filename, char* column) {
           printf("Error forking\n");
       }else if(t == 0){
 
-        running = handleChildProcess(msgID, recordArray, column, t);
+        char* uniqueValue = handleChildProcess(msgID, recordArray, column, t, &running);
+        
+        close(fd[0]); 
+
+        uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+
+        printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
+        
+        char* myArray = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
+  
+        char temp[MAX_RECORD_STRING];
+
+
+        strcpy(temp, myArray);
+//         printf("%s", temp);
+        
+        write(fd[1], &temp, sizeof(char[MAX_RECORD_STRING]));
+        close(fd[1]);
 
       }else{
           char* uniqueValue = uniqueValueArray[count];
           handleParentProcess(msgID, uniqueValue, t);
+        
+          close(fd[1]);
+        
+//           wait(NULL);
+          /* Send "text" through the output side of pipe */
+        
+          char recordString[MAX_RECORD_STRING];
+        
+          read(fd[0], &recordString, sizeof(char[MAX_RECORD_STRING]));
+        
+//           printf("In parent-%s", recordString);
+        
+          struct uniqueRecordStruct record = unwrap(recordString);
+          printf("The received message is: %s\n", record.recordArray[12][1]);
+                
+//           struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
+//           for (int i = 0; i < record.rowSize; i++) {
+//             for (int j = 0; j < record.colSize; j++) {
+//               printf("Col: %s ", record.recordArray[i][j]);
+//             }
+//             printf("\n");
+//           }
+        
+          uniqueRecords[count] = record;
+        
+          close(fd[0]);
 
           count++;
       }
       currentProcess++;
-      printf("Process %d finished\n", t);
+//       printf("Process %d finished\n", t);
   }
 
 
   if(t == 0){
       int var = msgctl(msgID, IPC_RMID, NULL);
-      printf("\nDestoryed %d\n", var);
+      printf("\nDestroyed %d\n", var);
+
+  } else {
+//         struct uniqueRecordStruct record = receiveDataViaPipe("In stock");
+//     strcpy(record.uniqueValue, uniqueValue);
   }
   wait(NULL);
 }
 
-int handleChildProcess(int msgID, struct uniqueRecordStruct recordArray, char* column, int t) {
-  int running = 1;
+char* handleChildProcess(int msgID, struct uniqueRecordStruct recordArray, char* column, int t, int* running) {
+  *running = 1;
   struct msgQue message;
   
   printf("Entering child process PID: %d\n", t);
   int msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR);
   if(msgCheck == -1){
-      printf("Error receiving message\n");
+      perror("Error receiving message");
   }
   printf("Recieved message: %s\n",message.msgText);
 
-  struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, message.msgText);
+//   uniqueRecord = getRecordsByUniqueValue(recordArray, column, message.msgText);
 
-  printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
-  
-  sendDataViaPipe(uniqueRecord.uniqueValue, uniqueRecord);
+//   printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
 
-  if(msgCheck != -1){
-      printf("Success!\n");
-      running = 0;
-      //break;
-  }
+  printf("Success!\n");
+
+//   sendDataViaPipe(uniqueRecord.uniqueValue, uniqueRecord);
   
-  return running;
+  *running = 0;
+  
+  char* uniqueValue = message.msgText;
+
+  return uniqueValue;
 }
 
 void handleParentProcess(int msgID, char* uniqueValue, int t) {
   struct msgQue message;
   
-  printf("Entering parent process PID: %d\n", t);
+//   printf("Entering parent process PID: %d\n", t);
   message.msgType = 1;
 
   strcpy(message.msgText, uniqueValue);
 
   int msgCheck = msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0);
   if(msgCheck == -1){
-      printf("Error sending message\n");
+      perror("Error sending message.");
   }
   printf("\nMessage sent\n");
-  
-  struct uniqueRecordStruct record = receiveDataViaPipe(uniqueValue);
-  strcpy(record.uniqueValue, uniqueValue);
+//   struct uniqueRecordStruct record = receiveDataViaPipe(uniqueValue);
+
 }
