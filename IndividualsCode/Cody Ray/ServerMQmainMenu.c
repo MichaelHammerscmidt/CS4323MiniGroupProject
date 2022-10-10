@@ -13,6 +13,7 @@
 #include <sys/ipc.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 struct msgQue{
     long int msgType;
@@ -65,8 +66,6 @@ int main(){
 
     //infinite loop to handle the rest of the server client connections and communication
     while(1){
-        //return point for the child processes once their client disconnects
-        
         //creates a new server socket for future clients to connect to and sends an error message if something is wrong
         newSocket = accept(serverSocket, (struct sockaddr*)&newServerAddress, &newServerAddressSize);
         if(newSocket < 0){
@@ -79,6 +78,95 @@ int main(){
         if((childProcessID = fork()) == 0){
             //closes the main port that clients use to connect in the child processes
             close(serverSocket);
+            
+            char filename[36];
+            char column[36];
+            char uniqueValue[128];
+            bool mainMenu = true;
+            int currentRecievedMsg = 0;
+
+            
+
+            while(mainMenu){
+                bzero(buffer,sizeof(buffer));
+                if(currentRecievedMsg == 1){
+                    send(newSocket, "Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n", strlen("Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n"),0);
+                    bzero(buffer,sizeof(buffer));
+                }else if(currentRecievedMsg == 2){
+                    send(newSocket, "Choose an option 1.Book category or 2.Star rating or 3.Stock\n", strlen("Choose an option 1.Book category or 2.Star rating or 3.Stock\n"),0);
+                    bzero(buffer,sizeof(buffer));
+                }else if(currentRecievedMsg == 3){
+                    send(newSocket, "Choose an option 1.User rating or 2.Year or 3.Genre\n", strlen("Choose an option 1.User rating or 2.Year or 3.Genre\n"),0);
+                    bzero(buffer,sizeof(buffer));
+                }
+                
+                //receives messages from the client 
+                recv(newSocket, buffer, 512, 0);  
+
+                if(strcmp(buffer, "exit") == 0){
+                    close(newSocket);
+                    printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
+                    return 0;    
+                }else if(strlen(buffer) > 0){
+                    //displays what the client has sent to the server
+                    printf("Client sent: %s\n", buffer);
+                }
+                
+                if(currentRecievedMsg == 0){
+                    currentRecievedMsg = 1;
+                    printf("currentRecievedMSG = 1\n");
+                }else if(currentRecievedMsg == 1){
+                    if(strcmp(buffer, "1") == 0){
+                        strcpy(filename,"bookInfo.txt");
+                        currentRecievedMsg = 2;
+                        printf("Input was 1 and filename set to bookInfo.txt new currentRecievedMSG = 2\n");
+                    }else if(strcmp(buffer, "2") == 0){
+                        strcpy(filename,"amazonBestsellers.txt");
+                        currentRecievedMsg = 3;
+                        printf("Input was 2 and filename set to amazonBestsellers.txt new currentRecievedMSG = 3\n");
+                    }
+                }else if(currentRecievedMsg == 2){
+                    if(strcmp(buffer, "1") == 0){
+                        strcpy(column,"Book category\n");
+                        printf("Input was 1 and column set to book category new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }else if(strcmp(buffer, "2") == 0){
+                        strcpy(column,"Star rating\n");
+                        printf("Input was 2 and column set to star rating new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }else if(strcmp(buffer, "3") == 0){
+                        strcpy(column,"Stock\n");
+                        printf("Input was 3 and column set to stock new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }
+                }else if(currentRecievedMsg == 3){
+                    if(strcmp(buffer, "1") == 0){
+                        strcpy(column,"User rating\n");
+                        printf("Input was 1 and column set to user rating new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }else if(strcmp(buffer, "2") == 0){
+                        strcpy(column,"Year\n");                 
+                        printf("Input was 2 and column set to year new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }else if(strcmp(buffer, "3") == 0){
+                        strcpy(column,"Genre\n");
+                        printf("Input was 3 and column set to genre new currentRecievedMSG = 4\n");
+                        printf("Main menu completed\n");
+                        mainMenu = false;
+                    }
+                }
+            }
+
+            printf("%s\n", filename);
+            printf("%s\n", column);
+            bzero(buffer,sizeof(buffer));
+            send(newSocket, "Main Menu Input Completed\n", strlen("Main Menu Input Completed\n"), 0);
+            bzero(buffer,sizeof(buffer));
 
             //values that we use for the message que
             int numOfProcesses = 3;
@@ -94,11 +182,10 @@ int main(){
                 //receives messages from the client
                 recv(newSocket, buffer, 512, 0);
                 //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
-                if(strcmp(buffer, "exit") == 0){
+                if(strcmp(buffer, "exit") == 0){    
                     close(newSocket);
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
-                    return 0;
-                    
+                    return 0;    
                 }else if(strlen(buffer) > 0){
                     //displays what the client has sent to the server
                     printf("Client sent: %s\n", buffer);
