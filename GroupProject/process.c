@@ -17,16 +17,16 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 struct msgQue{
     long int msgType;
     char msgText[MAX_TEXT];
-};
+}; 
 
-struct uniqueRecordStruct uniqueRecord;
+struct uniqueRecordStruct testRecord;
 
 struct uniqueRecordStruct uniqueRecords[5];
 
 int main(){
   
-    char* column = "Stock";
-    manageIPC("bookInfo.txt", column);
+    char* column = "Genre";
+    manageIPC("amazonBestsellersllers.txt", column);
   
     wait(NULL);
 //     struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
@@ -79,7 +79,7 @@ void manageIPC(char* filename, char* column) {
         
         close(fd[0]); 
 
-        uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+        struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
 
         printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
         
@@ -111,14 +111,11 @@ void manageIPC(char* filename, char* column) {
         
           struct uniqueRecordStruct record = unwrap(recordString);
           printf("The received message is: %s\n", record.recordArray[12][1]);
-                
-//           struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
-//           for (int i = 0; i < record.rowSize; i++) {
-//             for (int j = 0; j < record.colSize; j++) {
-//               printf("Col: %s ", record.recordArray[i][j]);
-//             }
-//             printf("\n");
-//           }
+        
+          if (strncmp(uniqueValue, "Non Fiction", strlen("Non Fiction")) == 0) {
+            testRecord = record;
+          }
+
         
           uniqueRecords[count] = record;
         

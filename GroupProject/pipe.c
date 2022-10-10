@@ -10,6 +10,7 @@
 #include <sys/msg.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAX 9000000 // 9 billion times
 

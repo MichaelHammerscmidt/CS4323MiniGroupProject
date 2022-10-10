@@ -27,25 +27,23 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 
 // int main() {
 
-//     char *filename = "bookInfo.txt";
-//     char *column = "Stock";
-//     char *uniqueValue = "In stock";
+//     char *filename = "amazonBestsellers.txt";
+//     char *column = "Genre";
+//     char *uniqueValue = "Fiction";
 
 //     struct uniqueRecordStruct recordArray = readFile(filename);
-// //     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
   
+//     int numberOfUniques = 0;
+//     char** uniqueArray = getUniqueValues(recordArray, column, &numberOfUniques);
+//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
     
-// //     for (int i = 1; i < recordArray.rowSize; i++) {
-// //       for (int j = 0; j < recordArray.colSize; j++) { 
-// //           printf("%s ", recordArray.recordArray[i][j]);
+    
+// //     for (int i = 0; i < uniqueRecord.rowSize; i++) {
+// //       for (int j = 0; j < uniqueRecord.colSize; j++) { 
+// //           printf("%s ", uniqueRecord.recordArray[i][j]);
 // //       }
 // //       printf("---------------------------------\n");
 // //     }
-  
-//     // struct processDataStruct data;
-    
-//     // sendDataToParent(data);
-  
 //     return 0;
 
 // }
@@ -56,8 +54,8 @@ struct uniqueRecordStruct readFile(char* filename) {
   int nValues = 300;
 
   if (strcmp(filename, "amazonBestsellers.txt") == 0) {
-    nRows = 555;
-    nCols = 6;
+    nRows = 552;
+    nCols = 7;
   }
   
   struct uniqueRecordStruct record;
@@ -100,14 +98,20 @@ struct uniqueRecordStruct readFile(char* filename) {
           token = strtok(NULL, ",");
           col_count++;
       }
+    
+      if (strcmp(filename, "amazonBestsellers.txt") == 0 && row_count >= 549) {
+        break;
+      }
+      
+//     printf("row_count %d\n", row_count);
 
-    row_count++;
+      row_count++;
   }
   
   record.colSize = col_count;
   record.rowSize = row_count;
   
-//   for (int i = 1; i < record.rowSize; i++) {
+//   for (int i = 0; i < record.rowSize; i++) {
 //     for (int j = 0; j < record.colSize; j++) { 
 //         printf("%s ", record.recordArray[i][j]);
 //     }
@@ -127,7 +131,7 @@ char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* ret
   
   int colIndex = 0;
   for (int i = 0; i < records.colSize; i++) {
-    if (strcmp(records.recordArray[0][i], column) == 0) {
+    if (strncmp(records.recordArray[0][i], column, strlen(column)) == 0) {
       colIndex = i;
 //       printf("colIndex: %d\n", colIndex);
       break;
@@ -168,7 +172,7 @@ char** getUniqueValues(struct uniqueRecordStruct records, char* column, int* ret
 struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct records, char* column, char* uniqueValue) {
   int colIndex = 0;
   for (int i = 0; i < records.colSize; i++) {
-    if (strcmp(records.recordArray[0][i], column) == 0) {
+    if (strncmp(records.recordArray[0][i], column, strlen(column)) == 0) {
       colIndex = i;
 //       printf("colIndex: %d\n", colIndex);
       break;
@@ -180,8 +184,8 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   int row = 0;
   int col = 0;
   for (int i = 0; i < records.rowSize; i++) {
-    if (i != 0 && strcmp(records.recordArray[i][colIndex], uniqueValue) != 0) {
-//       printf("Row %d: %s\n", i, records.recordArray[i][4]);
+    if (i != 0 && strncmp(records.recordArray[i][colIndex], uniqueValue, strlen(uniqueValue)) != 0) {
+//       printf("Row %d: %s\n", i, records.recordArray[i][6]);
       continue;
     }
     
@@ -203,4 +207,89 @@ struct uniqueRecordStruct getRecordsByUniqueValue(struct uniqueRecordStruct reco
   uniqueRecordArray.colSize = col;
   
   return uniqueRecordArray;
+}
+
+void msgsnd_(int msgid, struct processDataStruct data, int size, int pms) {
+    snd(data);
+}
+
+struct processDataStruct msgrcv_(int msgid, char uniqueValue[20], int size, int pms, int detr) {
+    struct processDataStruct data = rcv(uniqueValue);    
+
+    printf("Data received: %s\n", data.uniqueValue);
+    return data;
+}
+
+void snd(struct processDataStruct data) {
+    char filename[30];
+
+    strcpy(filename, data.uniqueValue);
+    strcat(filename, ".txt");
+
+    FILE *outFile = fopen(filename, "w");
+    printf("snd: filename -> %s\n", filename);
+
+    if (outFile == NULL || !outFile) {
+      printf("There was an error opening the file for writing\n");
+      perror("fopen for writing");
+      exit(EXIT_FAILURE);
+    }
+
+    fprintf(outFile, "%s\n", data.uniqueValue);
+    fprintf(outFile, "%s\n", data.column);
+    fprintf(outFile, "%s\n", data.filename);
+    fclose(outFile);
+}
+
+struct processDataStruct rcv(char uniqueValue[20]) {
+    char filename[20];
+    strcpy(filename, uniqueValue);
+    strcat(filename, ".txt");
+
+    printf("rcv: filename -> %s\n", filename);
+    FILE *inFile = fopen(filename, "r");
+    if (!inFile) {
+        perror("fopen for reading");
+        exit(EXIT_FAILURE);
+    }
+
+    char *line = (char *)malloc(sizeof(char));
+    int row = 0;
+    int col = 0;
+
+    char processData[3][20];
+    while (fscanf(inFile, "%[^\n] ", line) != EOF) {
+        strcpy(processData[row], line);
+        // printf("processData[%d]: %s\n", row, processData[row]);
+
+        row++;
+    }
+
+    struct processDataStruct data;
+
+    strcpy(data.uniqueValue, processData[0]);
+    strcpy(data.column, processData[1]);
+    strcpy(data.filename, processData[2]);
+    return data;
+}
+
+void sendDataToParent(struct processDataStruct data) {
+    printf("sendDataToParent: uniqueValue -> %s\n", data.uniqueValue);
+    snd(data);
+}
+
+struct uniqueRecordStruct receiveDataFromProcess(char filename[20],
+                                                 char column[20],
+                                                 char uniqueValue[20]) {
+    
+    struct processDataStruct data;
+    strcpy(data.uniqueValue, uniqueValue);
+    strcpy(data.column, column);
+
+    rcv(uniqueValue);
+
+    struct uniqueRecordStruct recordArray = readFile(data.filename);
+    struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, data.column, data.uniqueValue);
+
+    return uniqueRecord;
 }
