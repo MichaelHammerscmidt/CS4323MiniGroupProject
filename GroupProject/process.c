@@ -19,7 +19,7 @@ struct msgQue{
     char msgText[MAX_TEXT];
 }; 
 
-struct uniqueRecordStruct uniqueRecord;
+struct uniqueRecordStruct testRecord;
 
 struct uniqueRecordStruct uniqueRecords[5];
 
@@ -79,7 +79,7 @@ void manageIPC(char* filename, char* column) {
         
         close(fd[0]); 
 
-        uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
+        struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, column, uniqueValue);
 
         printf("The unique value is: %s\n", uniqueRecord.uniqueValue);
         
@@ -111,6 +111,10 @@ void manageIPC(char* filename, char* column) {
         
           struct uniqueRecordStruct record = unwrap(recordString);
           printf("The received message is: %s\n", record.recordArray[12][1]);
+        
+          if (strncmp(uniqueValue, "Non Fiction", strlen("Non Fiction")) == 0) {
+            testRecord = record;
+          }
 
         
           uniqueRecords[count] = record;

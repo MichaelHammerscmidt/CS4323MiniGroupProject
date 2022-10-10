@@ -7,6 +7,7 @@
 #include "read_file.h"
 #include "unique_record_struct.h"
 #include "process_data_struct.h"
+#include "ServerCombine.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -25,19 +26,10 @@
 #define MAX_RECORD_STRING 80000
 
 
-// struct uniqueRecordStruct {
-//     char uniqueValue[30];
-//     int rowSize;
-//     int colSize;
-//     char recordArray[700][7][300];
-// };
-
-
 struct msgQue{
     long int msgType;
     char msgText[50];
 };
-
 
 int main(){
     //port used for connection between client and server
@@ -387,9 +379,9 @@ int main(){
 //         }
       
       
-        strcpy(filename, "amazonBestsellers.txt");
-        strcpy(column, "Genre");
-        strcpy(uniqueValue, "Non  Fiction");
+        strcpy(filename, "bookInfo.txt");
+        strcpy(column, "Stock");
+        strcpy(uniqueValue, "In stock");
         
         // Read the file and save into the struct.
         struct uniqueRecordStruct uniqueRecordArray = readFile(filename);
@@ -518,13 +510,15 @@ int main(){
 
                           read(fd[0], &recordString, sizeof(char[MAX_RECORD_STRING]));
 
-                //           printf("In parent-%s", recordString);
+//                           printf("In parent-%s", recordString);
 
                           struct uniqueRecordStruct uniqueRecord = unwrap(recordString);
-                          printf("The received message is: %s\n", uniqueRecord.recordArray[12][1]);
+                          strcpy(uniqueRecord.uniqueValue, uniqueArray[count]);
+//                           printf("The received message is: %s\n", uniqueRecord.recordArray[12][1]);
                           
-                          if (strncmp(uniqueArray[count], "Non Fiction", strlen("Non Fiction")) == 0) {
+                          if (strncmp(uniqueArray[count], uniqueValue, strlen(uniqueValue)) == 0) {
                             // Either display or save
+                            displayOrSave(uniqueRecord, false);
                           }
 
 
@@ -548,3 +542,44 @@ int main(){
     }
     return 0;
 }
+
+void displayOrSave(struct uniqueRecordStruct uniqueRecord, bool isDisplay) {
+  if (isDisplay) {
+    display(uniqueRecord);
+  } else {
+    save(uniqueRecord);
+  }
+}
+
+void display(struct uniqueRecordStruct uniqueRecord) {
+  for (int i = 1; i < uniqueRecord.rowSize; i++) {
+      for (int j = 0; j < uniqueRecord.colSize; j++) { 
+          printf("%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
+
+          printf("%s\n\n", uniqueRecord.recordArray[i][j]);
+      }
+      printf("---------------------------------\n");
+  }
+}
+
+void save(struct uniqueRecordStruct uniqueRecord) {
+  char filename[50];
+  strcpy(filename, uniqueRecord.uniqueValue);
+  strcat(filename, ".txt");
+  
+  FILE *outFile = fopen(filename, "w");
+  if (outFile == NULL || !outFile) {
+    perror("There was an error opening the file for writing");
+    exit(EXIT_FAILURE);
+  }
+  
+  for (int i = 1; i < uniqueRecord.rowSize; i++) {
+      for (int j = 0; j < uniqueRecord.colSize; j++) {
+        fprintf(outFile, "%d. %s\n", (j + 1), uniqueRecord.recordArray[0][j]);
+        fprintf(outFile, "%s\n\n", uniqueRecord.recordArray[i][j]);
+      }
+      fprintf(outFile, "---------------------------------\n");
+  }
+  fclose(outFile);
+}
+
