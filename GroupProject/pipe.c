@@ -1,7 +1,6 @@
-#include "unique_record_struct.h"
-#include "process_data_struct.h"
-#include <stdlib.h>
+// #include "read_file.c"
 #include "pipe.h"
+#include "unique_record_struct.h"
 #include <stdio.h>  // Baisc standard I/O like printf
 #include <unistd.h>  // defines standard symbolic constants and types
 #include <sys/types.h>  // basic derived types like pid_t
@@ -12,38 +11,33 @@
 #include <sys/wait.h>
 #include <string.h>
 
-#define MAX 900000 // 9 billion times
+#define MAX 9000000 // 9 billion times
 
 #define MAX_RECORD_STRING 80000
 
-char myPipe[] = "./NamedPipe";  // FIFO file path 
-
-//extern struct uniqueRecordStruct uniqueRecordArray;
-
+char myPipe[] = "./NamedPipe";  // FIFO file path
 // int main() {
-    
+  
+//     struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
+
+//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
+  
 //     int pid = fork();
 //     if (pid < 0) {
 //         printf("There was an error creating the process\n");
 //         return 0;
 //     }
-  
-  
-//     struct uniqueRecordStruct recordArray = readFile("bookInfo.txt");
 
-//     struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(recordArray, "Stock", "In stock");
-
-    
 //     if (pid == 0) {
 //         sendDataViaPipe(myPipe, uniqueRecord);
 //     } else {
 //         receiveDataViaPipe(myPipe);
 //     }
+
+// //     char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
+// //     printf("The array:%sC\n", recordString);
   
-//     char* recordString = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
-//     printf("The array:%sC\n", recordString);
-  
-//     struct uniqueRecordStruct newRecord = unwrap(recordString);
+// //     struct uniqueRecordStruct newRecord = unwrap(recordString);
 
 //     return 0;
 // }
@@ -58,20 +52,51 @@ void sendDataViaPipe(char* myPipe, struct uniqueRecordStruct uniqueRecord) {
     }
 
     printf("Computation done...\n");
-    mkfifo(myPipe, 0666); // Creating the named file(FIFO)
+    int resp = mkfifo(myPipe, 0666); // Creating the named file(FIFO)
+    if (resp < 0) {
+      perror("Could not create the named file.");
+    }
+    while (resp < 0) {
+        if (remove(myPipe) == 0) {
+            printf("Deleted successfully\n");
 
-    if ((fd = open(myPipe, O_WRONLY | O_CREAT)) < 0) {  // Open FIFO for write only
-        printf("1: Error opening..");
+        } else {
+            printf("Unable to delete the file\n");
+        }
+      
+        resp = mkfifo(myPipe, 0666); // Creating the named file(FIFO)
+        if (resp == 0) {
+          printf("Named file created successfully.\n");
+        }
+    }
+
+    printf("I am in the send function\n");
+   
+    if ((fd = open(myPipe, O_WRONLY)) < 0) {  // Open FIFO for write only
+      perror("Could not open the named file.");
+//       printf("1: Error opening..\n");
+      
+      remove(myPipe);
+      close(fd);
+      return;
     }
   
+    printf("Opened the named file at the receiver.\n");
+  
+    printf("Now here!\n");
+
     char* myArray = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
- 
+  
+//     strcat(recordString, "\n");
+//     char* temp = strtok(recordString, "\n");
+  
     char temp[MAX_RECORD_STRING];
 
+  
     strcpy(temp, myArray);
 //     printf("%s", temp);
     if (write(fd, &temp, sizeof(char[900000])) < 0) {// Write on the FIFO
-        printf("1: Error writing..");
+        perror("Could not write to the named file.");
     }
     close(fd);  // Close the pipe
 }
@@ -87,22 +112,41 @@ struct uniqueRecordStruct receiveDataViaPipe(char* myPipe) {
         result = result + i;
     }
 
-    mkfifo(myPipe, 0666); // Creating the named file(FIFO) 
-    if ((fd = open(myPipe, O_RDONLY)) < 0) { // Open FIFO for Read only
-        printf("2: Error opening..");
+    int resp = mkfifo(myPipe, 0666); // Creating the named file(FIFO)
+    if (resp < 0) {
+      perror("Could not create the named file.");
+    }
+    while (resp < 0) {
+        if (remove(myPipe) == 0) {
+            printf("Deleted successfully\n");
+
+        } else {
+            printf("Unable to delete the file\n");
+        }
+      
+        resp = mkfifo(myPipe, 0666); // Creating the named file(FIFO)
+        if (resp == 0) {
+          printf("Named file created successfully.\n");
+        }
     }
   
+    printf("I am in the receive function\n");
+    if ((fd = open(myPipe, O_RDONLY)) < 0) { // Open FIFO for Read only
+        perror("Could not open the named file.");
+    }
+  
+    printf("Opened the named file at the receiver.\n");
     char recordString[MAX_RECORD_STRING];
   
     if (read(fd, &recordString, sizeof(char[900000])) < 0) { // Read from FIFO 
-      printf("2: Error reading..");
+      perror("Could not read from the named file.");
     }
   
     struct uniqueRecordStruct record = unwrap(recordString);
     printf("The received message is: %d\n", record.rowSize);
     close(fd);  // Close the pipe
   
-    return record;
+  return record;
 }
 
 char* concatenate(char recordArray[705][7][300], int row, int col) {  
@@ -175,6 +219,3 @@ struct uniqueRecordStruct unwrap(char* arrayString) {
   
     return record;
 }
-
-
-
