@@ -17,7 +17,7 @@ extern struct uniqueRecordStruct uniqueRecordArray;
 struct msgQue{
     long int msgType;
     char msgText[MAX_TEXT];
-};
+}; 
 
 struct uniqueRecordStruct uniqueRecord;
 
@@ -25,8 +25,8 @@ struct uniqueRecordStruct uniqueRecords[5];
 
 int main(){
   
-    char* column = "Stock";
-    manageIPC("bookInfo.txt", column);
+    char* column = "Genre";
+    manageIPC("amazonBestsellersllers.txt", column);
   
     wait(NULL);
 //     struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
@@ -111,14 +111,7 @@ void manageIPC(char* filename, char* column) {
         
           struct uniqueRecordStruct record = unwrap(recordString);
           printf("The received message is: %s\n", record.recordArray[12][1]);
-                
-//           struct uniqueRecordStruct uniqueRecord_ = uniqueRecords[0];
-//           for (int i = 0; i < record.rowSize; i++) {
-//             for (int j = 0; j < record.colSize; j++) {
-//               printf("Col: %s ", record.recordArray[i][j]);
-//             }
-//             printf("\n");
-//           }
+
         
           uniqueRecords[count] = record;
         

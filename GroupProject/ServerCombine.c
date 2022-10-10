@@ -10,18 +10,19 @@
 
 #include <stdio.h>
 #include <string.h>
-#include<stdbool.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/msg.h>
 #include <sys/ipc.h>
-#include <stdlib.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>  //required for open (i.e. file control options)
+#define MAX_RECORD_STRING 80000
 
 
 // struct uniqueRecordStruct {
@@ -100,7 +101,7 @@ int main(){
         char filename[36];
         char column[36];
         char uniqueValue[128];
-        int numberOfUniques;
+        int numberOfUniques = 0;
       
         
 //         while (1)
@@ -387,8 +388,8 @@ int main(){
       
       
         strcpy(filename, "amazonBestsellers.txt");
-        strcpy(column, "Year");
-        //strcpy(uniqueValue, "In Stock");
+        strcpy(column, "Genre");
+        strcpy(uniqueValue, "Non  Fiction");
         
         // Read the file and save into the struct.
         struct uniqueRecordStruct uniqueRecordArray = readFile(filename);
@@ -398,14 +399,7 @@ int main(){
         struct uniqueRecordStruct uniqueValueRecord;
       
         // TODO:  save the unique values ------------------------------
-        int BUF_SIZE = 11;
-        char **uniqueArray = (char **)malloc(BUF_SIZE * sizeof(char *));
-
-        for (int i = 0; i < BUF_SIZE; i++) {
-          uniqueArray[i] = (char *)malloc(100 * sizeof(char));
-        }
-      
-        uniqueArray = getUniqueValues(uniqueRecordArray, column, &numberOfUniques);
+        char **uniqueArray = getUniqueValues(uniqueRecordArray, column, &numberOfUniques);
 
         //creates each of the child processes
         if((childProcessID = fork()) == 0){
@@ -413,10 +407,9 @@ int main(){
             close(serverSocket);
 
             //values that we use for the message que
-            int numOfProcesses = 3;
+            int numOfProcesses = 2;
             int currentProcess = 0;
             int msgID;
-            int msgCheck;
             int running = 1;
             struct msgQue message;
             int t;
@@ -447,8 +440,14 @@ int main(){
                     bzero(buffer,sizeof(buffer));
                 }
 
-                //loop to create the number of child processes we need to 
+                //loop to create the number of child processes we need to
+              
+                int count = 0;
                 while(currentProcess < numOfProcesses && running == 1){
+                  
+                    int fd[2];
+                    pipe(fd);
+                  
                     //creates a message queue
                     msgID = msgget((key_t)t, 0666 | IPC_CREAT);
                     //makes sure there where no problems in the message queue creation
@@ -464,44 +463,74 @@ int main(){
                     if(t < 0){
                         printf("Error forking\n");
                         return 0;
-                    }else if(t == 0){ //child process
+                      
+                    } else if(t == 0){ //child process
                         printf("Entering child process PID: %d\n", t);
-                        //checks the message queue for a message
-                        msgCheck = msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR);
+                      
                         //makes sure there where no errors recieving the message
-                        if(msgCheck == -1){
+                        if(msgrcv(msgID, (void *)&message, sizeof(message.msgText),1,MSG_NOERROR) == -1){
                             printf("Error receiving message\n");
-                        }
-                        else{
-                        //prints out the recieved message
-                        printf("Recieved message: %s\n",message.msgText);
-                        //determines if the message is the correct message
+                          
+                        } else{
+                            //prints out the recieved message
+                            printf("Recieved message: %s\n", message.msgText);
 //                         
                             printf("Success!\n");
                             //breaks the child process out of the loop after it has recieved its message so it doesnt fork and create children as well
-                            struct uniqueRecordStruct records;
                             // params include our struct instance called records, column, uniqueValue
                             
-                            records = getRecordsByUniqueValue(uniqueRecordArray, column, message.msgText);
-                            
-                            sendDataViaPipe(message.msgText, records);
+                            struct uniqueRecordStruct uniqueRecord = getRecordsByUniqueValue(uniqueRecordArray, column, message.msgText);
+                            close(fd[0]);
+                          
+                            char* myArray = concatenate(uniqueRecord.recordArray, uniqueRecord.rowSize, uniqueRecord.colSize);
+  
+                            char temp[MAX_RECORD_STRING];
+
+                            strcpy(temp, myArray);
+//                             printf("%s", temp);
+
+                            write(fd[1], &temp, sizeof(char[MAX_RECORD_STRING]));
+                            close(fd[1]);
+                          
+                            //sendDataViaPipe(message.msgText, records);
                             
                             running = 0;
                         }
                     }else{ //parent process
                         printf("Entering parent process PID: %d\n", t);
                         message.msgType = 1;
-                        //copies the message into the value we are passing in the queue
-                        strcpy(message.msgText,"2005");
-                        //sends the current message to the message queue
-                        msgCheck = msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0);
+                      
+                        strcpy(message.msgText, uniqueArray[count]);
+                      
                         //makes sure there where no errors sending the message
-                        if(msgCheck == -1){
+                        if(msgsnd(msgID, (void *)&message, sizeof(message.msgText), 0) == -1){
                             printf("Error sending message\n");
-                        }
-                        else{
+                          
+                        } else{
                           printf("\nMessage sent\n");
-                          uniqueValueRecord = receiveDataViaPipe(myPipe);
+                          
+                          close(fd[1]);
+        
+                //           wait(NULL);
+                          /* Send "text" through the output side of pipe */
+
+                          char recordString[MAX_RECORD_STRING];
+
+                          read(fd[0], &recordString, sizeof(char[MAX_RECORD_STRING]));
+
+                //           printf("In parent-%s", recordString);
+
+                          struct uniqueRecordStruct uniqueRecord = unwrap(recordString);
+                          printf("The received message is: %s\n", uniqueRecord.recordArray[12][1]);
+                          
+                          if (strncmp(uniqueArray[count], "Non Fiction", strlen("Non Fiction")) == 0) {
+                            // Either display or save
+                          }
+
+
+                          close(fd[0]);
+
+                          count++;
                         }
                     }
                     //iterates through the loop to create a new process and print when processes are finished
@@ -514,16 +543,6 @@ int main(){
                         printf("Message Queue Destoryed %d\n", var);
                     }
                 }
-              
-              
-//               // logic to pipe 
-//               if(t == 0){
-                
-//                 //char* pipeName[];
-//                 //message.msgText
-//                 sendDataViaPipe("./TestPipe", uniqueRecordArray);
-//               }
- 
             }
         }
     }
