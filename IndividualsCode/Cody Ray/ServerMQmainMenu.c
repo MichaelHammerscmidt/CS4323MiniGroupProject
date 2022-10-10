@@ -79,15 +79,16 @@ int main(){
             //closes the main port that clients use to connect in the child processes
             close(serverSocket);
             
+            //variables to make the main menu work and store user input
             char filename[36];
             char column[36];
             char uniqueValue[128];
             bool mainMenu = true;
             int currentRecievedMsg = 0;
 
-            
-
+            //while loop that 
             while(mainMenu){
+                //loop which handles telling the client what to input
                 bzero(buffer,sizeof(buffer));
                 if(currentRecievedMsg == 1){
                     send(newSocket, "Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n", strlen("Choose an option 1.bookInfo.txt or 2.amazonBestsellers.txt\n"),0);
@@ -101,8 +102,8 @@ int main(){
                 }
                 
                 //receives messages from the client 
-                recv(newSocket, buffer, 512, 0);  
-
+                recv(newSocket, buffer, 512, 0);
+                //checks to make sure the client has not exited and if it has it disconnects the child process and closes the socket
                 if(strcmp(buffer, "exit") == 0){
                     close(newSocket);
                     printf("Disconnect on the IP %s and port %d\n", inet_ntoa(newServerAddress.sin_addr), ntohs(newServerAddress.sin_port));
@@ -112,47 +113,59 @@ int main(){
                     printf("Client sent: %s\n", buffer);
                 }
                 
+                //the first loop after random client input
                 if(currentRecievedMsg == 0){
                     currentRecievedMsg = 1;
                     printf("currentRecievedMSG = 1\n");
+                //loop that handles choosing which files to get options from
                 }else if(currentRecievedMsg == 1){
+                    //sets the filename value to bookinfo.txt if the user input was 1
                     if(strcmp(buffer, "1") == 0){
                         strcpy(filename,"bookInfo.txt");
                         currentRecievedMsg = 2;
                         printf("Input was 1 and filename set to bookInfo.txt new currentRecievedMSG = 2\n");
+                    //sets the filename to amazonbestsellers.txt if the user input was 2
                     }else if(strcmp(buffer, "2") == 0){
                         strcpy(filename,"amazonBestsellers.txt");
                         currentRecievedMsg = 3;
                         printf("Input was 2 and filename set to amazonBestsellers.txt new currentRecievedMSG = 3\n");
                     }
+                //loop that handles the user options for bookinfo.txt
                 }else if(currentRecievedMsg == 2){
+                    //sets the column value to book category if the user input was 1
                     if(strcmp(buffer, "1") == 0){
                         strcpy(column,"Book category\n");
                         printf("Input was 1 and column set to book category new currentRecievedMSG = 4\n");
                         printf("Main menu completed\n");
                         mainMenu = false;
+                    //sets the column value to star rating if the user input was 2
                     }else if(strcmp(buffer, "2") == 0){
                         strcpy(column,"Star rating\n");
                         printf("Input was 2 and column set to star rating new currentRecievedMSG = 4\n");
                         printf("Main menu completed\n");
                         mainMenu = false;
+                    //sets the column value to stock if the user input was 3
                     }else if(strcmp(buffer, "3") == 0){
                         strcpy(column,"Stock\n");
                         printf("Input was 3 and column set to stock new currentRecievedMSG = 4\n");
                         printf("Main menu completed\n");
                         mainMenu = false;
                     }
+                //loop that handles the user options for amazonbestsellers.txt
                 }else if(currentRecievedMsg == 3){
+                    //sets the column value to user rating if the user input was 1
                     if(strcmp(buffer, "1") == 0){
                         strcpy(column,"User rating\n");
                         printf("Input was 1 and column set to user rating new currentRecievedMSG = 4\n");
                         printf("Main menu completed\n");
                         mainMenu = false;
+                    //sets the column value to year if the user input was 2
                     }else if(strcmp(buffer, "2") == 0){
                         strcpy(column,"Year\n");                 
                         printf("Input was 2 and column set to year new currentRecievedMSG = 4\n");
                         printf("Main menu completed\n");
                         mainMenu = false;
+                    //sets the column value to genre if the user input was 3
                     }else if(strcmp(buffer, "3") == 0){
                         strcpy(column,"Genre\n");
                         printf("Input was 3 and column set to genre new currentRecievedMSG = 4\n");
@@ -162,6 +175,7 @@ int main(){
                 }
             }
 
+            //prints the users input and sends the client confirmation that the main menu is completed 
             printf("%s\n", filename);
             printf("%s\n", column);
             bzero(buffer,sizeof(buffer));
